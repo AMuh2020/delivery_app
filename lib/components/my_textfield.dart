@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+// rename at some point to details_textfield
 class MyTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;

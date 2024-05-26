@@ -4,6 +4,7 @@ import 'package:delivery_app/components/my_drawer.dart';
 import 'package:delivery_app/components/my_sliver_app_bar.dart';
 import 'package:delivery_app/components/my_tab_bar.dart';
 import 'package:delivery_app/components/resturant_list_item.dart';
+import 'package:delivery_app/components/resturant_search_bar.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -58,10 +59,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           SliverAppBar(
             pinned: true,
             title: Text("Delivery App"),
-            expandedHeight: 300,
+            expandedHeight: 250,
+            collapsedHeight: 70,
             centerTitle: true,
+            actions: [
+            ],
             flexibleSpace: FlexibleSpaceBar(
-              title: Text("placeholder"),
               background: Padding(
                 padding: const EdgeInsets.only(bottom: 50.0),
                 child: Column(
@@ -79,20 +82,58 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ),
               
             ),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(60.0), // Adjust as needed
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SearchAnchor( // needs looking into not working right now
+                isFullScreen: false,
+                  builder: (BuildContext context, SearchController searchController) {
+                    return SearchBar(
+                      padding: MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 25.0)),
+                      controller: searchController,
+                      hintText: "Search for resturants",
+                      leading: const Icon(Icons.search),
+                      onTap: () {
+                        searchController.openView();
+                      },
+                      onChanged: (value) {
+                        // todo
+                        // search for resturants
+                        searchController.openView();
+                      },
+                    );
+                  },
+                  // implement auto complete at some point
+                  // https://api.flutter.dev/flutter/material/Autocomplete-class.html
+                  suggestionsBuilder: (BuildContext context, SearchController controller) {
+                    return List<ListTile>.generate(5, (int index) {
+                      final String item = 'item $index';
+                      return ListTile(
+                        title: Text(item),
+                        onTap: () {
+                          setState(() {
+                            controller.closeView(item);
+                          });
+                        },
+                      );
+                    });
+                  }
+                ),
+              ),
+            ),
             
           ),
           SliverList.builder(
            itemBuilder: (BuildContext context, index) {
-                return Container(
-                  color: Colors.lightBlue[100 * (index % 9)],
-                  height: 300,
-                  width: 100,
-                  child: ResturantListItem(
-                    // backend will provide these values, will also manage the sorting
-                    name: "name",
-                    description: "description",
-                    imagePaths: ["assets/images/resturants/resturant1/previewimg1.png"],
-                  ),
+            return ResturantListItem(
+                  // backend will provide these values, will also manage the sorting
+                  resturantName: "name",
+                  description: "description",
+                  imagePaths: [
+                    "assets/images/resturants/previews/img1.png",
+                    "assets/images/flutter_logo.png",
+                  ], // stored as assest for now, will be stored in the backend
                 );
               },
               itemCount: 10,

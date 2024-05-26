@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+// used in resturant_page.dart
 
+// to do: data from the server
+// to do: make the delivery fee and delivery time dynamic
+// delivery fee based on calculations
 class MyDescriptionBox extends StatelessWidget {
   const MyDescriptionBox({super.key});
 

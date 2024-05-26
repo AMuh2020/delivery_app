@@ -1,3 +1,4 @@
+import 'package:delivery_app/components/food_list_item.dart';
 import 'package:delivery_app/components/my_current_location.dart';
 import 'package:delivery_app/components/my_description_box.dart';
 import 'package:delivery_app/components/my_drawer.dart';
@@ -6,7 +7,13 @@ import 'package:delivery_app/components/my_tab_bar.dart';
 import 'package:flutter/material.dart';
 
 class ResturantPage extends StatefulWidget {
-  const ResturantPage({super.key});
+  // gets passed the resturant name
+  final String resturantName;
+  const ResturantPage({super.key, required this.resturantName});
+
+  // todo
+  // get resturant details from the server
+
 
   @override
   State<ResturantPage> createState() => _ResturantPageState();
@@ -33,11 +40,11 @@ class _ResturantPageState extends State<ResturantPage> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      drawer: MyDrawer(),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             MySliverAppBar(
+              resturantName: widget.resturantName,
               title: MyTabBar(tabController: _tabController),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -50,7 +57,8 @@ class _ResturantPageState extends State<ResturantPage> with SingleTickerProvider
                   // current location
                   const MyCurrentLocation(),
 
-                  // description box
+                  // description box - delivery fee and time
+                  // rename at some point
                   const MyDescriptionBox()
                 ]
                 ),
@@ -60,11 +68,16 @@ class _ResturantPageState extends State<ResturantPage> with SingleTickerProvider
         body: TabBarView(
           controller: _tabController,
           children: [
+            // will be replaced with a list of menu items (need to make components for this)
+            // data from the server
             ListView.builder(
               itemCount: 10,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text('Item $index'),
+                return FoodItem(
+                  name: 'Food Name',
+                  description: 'Food Description',
+                  imagePath: 'assets/images/resturants/food/burger1.jpg',
+                  price: 10.00,
                 );
               },
             ),

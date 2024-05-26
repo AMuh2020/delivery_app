@@ -1,19 +1,21 @@
 import "package:flutter/material.dart";
-
+// used in resturant_page.dart
 class MySliverAppBar extends StatelessWidget {
   final Widget child;
   final Widget title;
+  final String resturantName;
 
   const MySliverAppBar({
     super.key,
     required this.child,
     required this.title,
+    required this.resturantName,
     });
 
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 300,
+      expandedHeight: 330,
       collapsedHeight: 100,
       floating: false,
       pinned: true,
@@ -22,15 +24,15 @@ class MySliverAppBar extends StatelessWidget {
         //   icon: Icon(Icons.search),
         //   onPressed: () {},
         // ),
-        // cart button
-        IconButton(
-          icon: Icon(Icons.shopping_cart),
-          onPressed: () {},
-        ),
-      
       ],
       backgroundColor: Theme.of(context).colorScheme.background,
-      title: Text('Delivery App'),
+      title: Text(
+        resturantName,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.inversePrimary,
+          fontSize: 24,
+        ),
+      ),
       centerTitle: true,
       flexibleSpace: FlexibleSpaceBar(
         background: Padding(
