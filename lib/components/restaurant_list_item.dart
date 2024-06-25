@@ -1,4 +1,4 @@
-import 'package:delivery_app/pages/resturant_page.dart';
+import 'package:delivery_app/pages/restaurant_page.dart';
 import 'package:flutter/material.dart';
 
 class ResturantListItem extends StatelessWidget {
@@ -43,16 +43,30 @@ class ResturantListItem extends StatelessWidget {
                   },
                 ),
               ),
-              const SizedBox(width: 10), // Add some spacing
+              const SizedBox(height: 10), // Add some spacing
               Flexible(
                 flex: 1,
-                child: Column(
+                fit: FlexFit.tight,
+                child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(resturantName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text(description),
+                  SizedBox(width: 10), // Add some spacing (left padding
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        resturantName,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      Text(
+                        description,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
                 ],
-              )),
+                )
+              ),
             ],
           ),
         ),

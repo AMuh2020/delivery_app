@@ -13,6 +13,7 @@ class ResturantPage extends StatefulWidget {
 
   // todo
   // get resturant details from the server
+  // menu items, reviews, info
 
 
   @override
@@ -68,7 +69,7 @@ class _ResturantPageState extends State<ResturantPage> with SingleTickerProvider
         body: TabBarView(
           controller: _tabController,
           children: [
-            // will be replaced with a list of menu items (need to make components for this)
+            // will be replaced with a list of menu items (need to make components for this) - done
             // data from the server
             ListView.builder(
               itemCount: 10,
@@ -81,7 +82,8 @@ class _ResturantPageState extends State<ResturantPage> with SingleTickerProvider
                 );
               },
             ),
-            Center(child: Text('Reviews')),
+            Center(child: Text('Reviews')), // will be replaced with a list of reviews
+            // todo - review list component
             Center(child: Text('Info')),
           ],
         ),
