@@ -20,10 +20,12 @@ class MySliverAppBar extends StatelessWidget {
       floating: false,
       pinned: true,
       actions: [
-        // IconButton(
-        //   icon: Icon(Icons.search),
-        //   onPressed: () {},
-        // ),
+        IconButton(
+          icon: const Icon(Icons.shopping_cart),
+          onPressed: () {
+            // Navigate to the cart page
+          },
+        ),
       ],
       backgroundColor: Theme.of(context).colorScheme.background,
       title: Text(

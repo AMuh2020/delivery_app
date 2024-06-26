@@ -1,19 +1,39 @@
 class Food {
+  final int id;
+  final int inventory;
   final String name;
   final String description;
-  final String imagePath;
-  final double price;
-  final FoodCategory category;
-  List<Addon> availableAddons;
+  final String price;
+  final String image;
+  final String createdAt;
+  final String updatedAt;
+  final int restaurant;
 
   Food({
+    required this.id,
+    required this.inventory,
     required this.name,
     required this.description,
-    required this.imagePath,
     required this.price,
-    required this.category,
-    required this.availableAddons,
+    required this.image,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.restaurant,
   });
+
+  factory Food.fromJson(Map<String, dynamic> json) {
+    return Food(
+      id: json['id'],
+      inventory: json['inventory'],
+      name: json['name'],
+      description: json['description'],
+      price: json['price'],
+      image: json['image'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+      restaurant: json['restaurant'], // id of the restaurant
+    );
+  }
 }
 
 // food categories
@@ -33,4 +53,11 @@ class Addon {
     required this.name,
     required this.price,
   });
+
+  factory Addon.fromJson(Map<String, dynamic> json) {
+    return Addon(
+      name: json['name'],
+      price: json['price'],
+    );
+  }
 }

@@ -18,7 +18,7 @@ class FoodItem extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // todo
-        // navigate to food page
+        // navigate to food page - with addons and add to cart button
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -27,13 +27,13 @@ class FoodItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             color: Theme.of(context).colorScheme.secondary,
           ),
-          height: 300, // Set the height of the image reel/gallery
+          height: 300, // Set the height of the image
           width: 100,
           child: Column(
             children: [
               Flexible(
                 flex: 2,
-                child: Image.asset(
+                child: Image.network(
                   imagePath,
                   fit: BoxFit.cover,
                 )
@@ -41,15 +41,20 @@ class FoodItem extends StatelessWidget {
               const SizedBox(width: 10), // Add some spacing
               Flexible(
                 flex: 1,
-                child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${name}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('${description}'),
-                  Text('Price: \$${price.toStringAsFixed(2)}'),
-
-                ],
-              )),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${name}', style: Theme.of(context).textTheme.titleLarge),
+                        Text('${description}', style: Theme.of(context).textTheme.bodyLarge),
+                        Text('Price: \$${price.toStringAsFixed(2)}'),
+                      ],
+                    ),
+                  ],
+                )
+              ),
             ],
           ),
         ),

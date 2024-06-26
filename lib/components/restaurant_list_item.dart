@@ -1,11 +1,13 @@
 import 'package:delivery_app/pages/restaurant_page.dart';
 import 'package:flutter/material.dart';
 
-class ResturantListItem extends StatelessWidget {
-  final String resturantName;
+class RestaurantListItem extends StatelessWidget {
+  final int restaurantId;
+  final String restaurantName;
+  final String restaurantAddress;
   final String description;
-  final List<String> imagePaths;
-  const ResturantListItem({Key? key, required this.resturantName, required this.description, required this.imagePaths}) : super(key: key);
+  final String imagePath;
+  const RestaurantListItem({Key? key, required this.restaurantId, required this.restaurantName, required this.restaurantAddress ,required this.description, required this.imagePath}) : super(key: key);
   // when page clicked, make a request to the server to get the resturant details 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +16,9 @@ class ResturantListItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ResturantPage(
-              resturantName: resturantName,
+            builder: (context) => RestaurantPage(
+              restaurantName: restaurantName,
+              restaurantId: restaurantId,
             )
           )
         );
@@ -31,16 +34,27 @@ class ResturantListItem extends StatelessWidget {
           width: 100,
           child: Column(
             children: [
+              // image as array
+              // Flexible(
+              //   flex: 2,
+              //   child: PageView.builder(
+              //     itemCount: imagePaths.length,
+              //     itemBuilder: (context, index) {
+              //       // return Image.asset(
+              //       //   imagePaths[index],
+              //       //   fit: BoxFit.cover,
+              //       // );
+              //       return Image.network(
+              //         imagePaths[index],
+              //         fit: BoxFit.cover,
+              //       );
+              //     },
+              //   ),
+              // ),
               Flexible(
-                flex: 2,
-                child: PageView.builder(
-                  itemCount: imagePaths.length,
-                  itemBuilder: (context, index) {
-                    return Image.asset(
-                      imagePaths[index],
-                      fit: BoxFit.cover,
-                    );
-                  },
+                child: Image.network(
+                  imagePath,
+                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 10), // Add some spacing
@@ -55,12 +69,19 @@ class ResturantListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        resturantName,
+                        restaurantName,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Text(
-                        description,
+                        restaurantAddress,
                         style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Flexible(
+                        child: Text(
+                          description,
+                          style: Theme.of(context).textTheme.titleMedium,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
