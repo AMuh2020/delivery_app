@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:delivery_app/components/my_current_location.dart';
 import 'package:delivery_app/components/my_description_box.dart';
 import 'package:delivery_app/components/my_drawer.dart';
-import 'package:delivery_app/components/my_sliver_app_bar.dart';
 import 'package:delivery_app/components/my_tab_bar.dart';
 import 'package:delivery_app/components/restaurant_list_item.dart';
 import 'package:delivery_app/components/resturant_search_bar.dart';
@@ -97,7 +96,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   // function to fetch resturants from the server
   Future<List<Restaurant>> fetchRestaurants() async {
-    final response = await http.get(Uri.parse('http://192.168.100.69:8000/restaurants/'));
+    final response = await http.get(Uri.parse('http://192.168.0.100:8000/restaurants/'));
     
     if (response.statusCode == 200) {
       // If the server returns an OK response, then parse the JSON.
@@ -119,25 +118,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(
-      //     "Delivery App",
-      //     style: TextStyle(
-      //       color: Theme.of(context).colorScheme.inversePrimary,
-      //       fontSize: 24,
-      //     ),
-      //   ),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.shopping_cart),
-      //       onPressed: () {
-      //         // Navigate to the cart page
-      //       },
-      //     ),
-      //   ],
-      //   centerTitle: true,
-      // ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      // backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: MyDrawer(),
       body: RefreshIndicator( // pull to refresh, fetch resturants again
         onRefresh: () async {
@@ -151,21 +132,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             SliverAppBar(
               pinned: true,
               title: Text("Delivery App"),
-              expandedHeight: 250,
+              expandedHeight: 200,
               collapsedHeight: 70,
               centerTitle: true,
-              actions: [],
-              flexibleSpace: FlexibleSpaceBar(
+              flexibleSpace: const FlexibleSpaceBar(
                 background: Padding(
                   padding: const EdgeInsets.only(bottom: 50.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Divider(
-                        indent: 25,
-                        endIndent: 25,
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
                       // current location
                       const MyCurrentLocation(),
                     ]
@@ -232,17 +207,21 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               future: futureRestaurants, // This should return a Future<List<Restaurant>>
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-          
                   return SliverList.builder(
                     itemBuilder: (BuildContext context, index) {
                       // Correctly access the restaurant at the current index
                       var restaurant = snapshot.data![index];
-                      return RestaurantListItem(
-                        restaurantId: restaurant.id, // id of the restaurant
-                        restaurantName: restaurant.name,  // name of the restaurant
-                        restaurantAddress: restaurant.address,
-                        description: restaurant.description,
-                        imagePath: restaurant.image, // single image (for now)
+                      return Column(
+                        children: [
+                          RestaurantListItem(
+                            restaurantId: restaurant.id, // id of the restaurant
+                            restaurantName: restaurant.name,  // name of the restaurant
+                            restaurantAddress: restaurant.address,
+                            description: restaurant.description,
+                            imagePath: restaurant.image, // single image (for now)
+                          ),
+                          SizedBox(height: 10.0),
+                        ],
                       );
                     },
                     itemCount: snapshot.data!.length,
@@ -257,7 +236,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   child: CircularProgressIndicator(),
                 );
               },
-              ),
+            ),
           ],
         ),
       ),

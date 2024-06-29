@@ -1,11 +1,11 @@
 import "package:flutter/material.dart";
 // used in resturant_page.dart
-class MySliverAppBar extends StatelessWidget {
+class RestaurantAppBar extends StatelessWidget {
   final Widget child;
   final Widget title;
   final String resturantName;
 
-  const MySliverAppBar({
+  const RestaurantAppBar ({
     super.key,
     required this.child,
     required this.title,
@@ -15,9 +15,7 @@ class MySliverAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 330,
-      collapsedHeight: 100,
-      floating: false,
+      expandedHeight: 300,
       pinned: true,
       actions: [
         IconButton(

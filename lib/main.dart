@@ -1,6 +1,7 @@
 
 
 import 'package:delivery_app/auth/login_or_register.dart';
+import 'package:delivery_app/models/food.dart';
 import 'package:flutter/material.dart';
 
 // import 'src/app.dart';
@@ -23,8 +24,11 @@ void main() async {
   // SettingsView.
   // runApp(MyApp(settingsController: settingsController));
   runApp(
-    ChangeNotifierProvider(
-      create: (context)  => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => CheckoutModel()),
+      ],
       child: MyApp(),
     ),
   );
@@ -40,4 +44,18 @@ class MyApp extends StatelessWidget {
       home: const LoginOrRegister(),
     );
   }
+}
+
+class CheckoutModel extends ChangeNotifier {
+  List<Food> checkoutItems = [];
+
+  void add(Food item) {
+    checkoutItems.add(item);
+    notifyListeners();
+  }
+  void remove(Food item) {
+    checkoutItems.remove(item);
+    notifyListeners();
+  }
+  int get subtotal => checkoutItems.fold(0, (sum, item) => sum + item.price);
 }

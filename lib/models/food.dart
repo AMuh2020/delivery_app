@@ -3,11 +3,12 @@ class Food {
   final int inventory;
   final String name;
   final String description;
-  final String price;
+  final int price;
   final String image;
   final String createdAt;
   final String updatedAt;
   final int restaurant;
+  List<Addon> addons = [];
 
   Food({
     required this.id,
@@ -19,6 +20,7 @@ class Food {
     required this.createdAt,
     required this.updatedAt,
     required this.restaurant,
+    addons,
   });
 
   factory Food.fromJson(Map<String, dynamic> json) {
@@ -47,7 +49,7 @@ enum FoodCategory {
 // food addons
 class Addon {
   final String name;
-  final double price;
+  final int price;
 
   Addon({
     required this.name,

@@ -1,5 +1,3 @@
-import 'package:delivery_app/models/food.dart';
-
 class Restaurant {
   final int id;
   final String name;

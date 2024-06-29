@@ -1,9 +1,10 @@
-import 'package:delivery_app/components/food_list_item.dart';
+import 'package:delivery_app/components/menu_list_item.dart';
 import 'package:delivery_app/components/my_current_location.dart';
 import 'package:delivery_app/components/my_description_box.dart';
 import 'package:delivery_app/components/my_drawer.dart';
-import 'package:delivery_app/components/my_sliver_app_bar.dart';
+import 'package:delivery_app/components/restaurant_app_bar.dart';
 import 'package:delivery_app/components/my_tab_bar.dart';
+import 'package:delivery_app/pages/checkout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:delivery_app/models/food.dart';
 import 'package:http/http.dart' as http;
@@ -27,110 +28,100 @@ class RestaurantPage extends StatefulWidget {
 
 class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProviderStateMixin{
 
-  // tab controller
-  late TabController _tabController;
+
 
   late Future<List<Food>> menuItems;
+
+  // array for checkout items
+  List<Food> checkoutItems = [];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     menuItems = fetchMenuItems();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     super.dispose();
   }
 
+  // fetch menu items from the server
   Future<List<Food>> fetchMenuItems() async {
-    final response = await http.get(Uri.parse('http://192.168.100.69:8000/fooditems/'));
+    final response = await http.get(
+      Uri.parse('http://192.168.0.100:8000/restaurants/${widget.restaurantId}/menu/')
+    );
     
     if (response.statusCode == 200) {
       // If the server returns an OK response, then parse the JSON.
+      print(response.body);
       final parsed = jsonDecode(response.body);
-      final results = parsed['results'] as List;
+      final results = parsed as List;
       print("RESULT FROM FOOD ${results}");
-      return results.where((json) => json['restaurant'] == widget.restaurantId).map<Food>((json) => Food.fromJson(json)).toList();
+      print('test');
+      return results.map((e) => Food.fromJson(e)).toList();
     } else {
       // If that response was not OK, throw an error.
       throw Exception('Failed to load resturants');
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            MySliverAppBar(
-              resturantName: widget.restaurantName,
-              title: MyTabBar(tabController: _tabController),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Divider(
-                    indent: 25,
-                    endIndent: 25,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                  // current location
-                  const MyCurrentLocation(),
-
-                  // description box - delivery fee and time
-                  // rename at some point
-                  const MyDescriptionBox()
-                ]
+      appBar: AppBar(
+        title: Text("${widget.restaurantName} Menu"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              // Action for checkout
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CheckoutPage(),
                 ),
-            ),
-          ];
+              );
+            },
+          ),
+        ],
+      ),
+      // backgroundColor: Theme.of(context).colorScheme.surface,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            menuItems = fetchMenuItems();
+          });
+          await menuItems;
         },
-        body: TabBarView(
-          controller: _tabController,
+        child: Column(
           children: [
-            FutureBuilder<List<Food>>(
-              future: menuItems,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return FoodItem(
-                        name: snapshot.data![index].name,
-                        description: snapshot.data![index].description,
-                        imagePath: snapshot.data![index].image,
-                        price: double.parse(snapshot.data![index].price),
-                      );
-                    },
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                }
-
-                return const Center(child: CircularProgressIndicator());
-              },
+            const MyCurrentLocation(),
+            const MyDescriptionBox(),
+            Flexible(
+              child: FutureBuilder<List<Food>>(
+                future: menuItems,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return MenuItem(
+                          name: snapshot.data![index].name,
+                          description: snapshot.data![index].description,
+                          imagePath: snapshot.data![index].image,
+                          price: snapshot.data![index].price,
+                          menuItemData: snapshot.data![index],
+                        );
+                      },
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
             ),
-            // will be replaced with a list of menu items (need to make components for this) - done
-            // data from the server
-            // ListView.builder(
-            //   itemCount: 10,
-            //   itemBuilder: (context, index) {
-            //     return FoodItem(
-            //       name: 'Food Name',
-            //       description: 'Food Description',
-            //       imagePath: 'assets/images/resturants/food/burger1.jpg',
-            //       price: 10.00,
-            //     );
-            //   },
-            // ),
-            Center(child: Text('Reviews')), // will be replaced with a list of reviews
-            // todo - review list component
-            Center(child: Text('Info')),
           ],
         ),
       ),
