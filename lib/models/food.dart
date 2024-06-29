@@ -8,7 +8,10 @@ class Food {
   final String createdAt;
   final String updatedAt;
   final int restaurant;
-  List<Addon> addons = [];
+  // these two variables are not required as they are not from api
+  // they are added to the model to keep track of the quantity and addons for checkout
+  int quantity;
+  List<Addon> addons;
 
   Food({
     required this.id,
@@ -20,7 +23,8 @@ class Food {
     required this.createdAt,
     required this.updatedAt,
     required this.restaurant,
-    addons,
+    this.addons = const [],
+    this.quantity = 0,
   });
 
   factory Food.fromJson(Map<String, dynamic> json) {

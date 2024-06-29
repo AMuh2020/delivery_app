@@ -57,5 +57,16 @@ class CheckoutModel extends ChangeNotifier {
     checkoutItems.remove(item);
     notifyListeners();
   }
-  int get subtotal => checkoutItems.fold(0, (sum, item) => sum + item.price);
+  int get subtotal => checkoutItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+
+  void increaseQuantity(Food item) {
+    item.quantity++;
+    notifyListeners();
+  }
+  void decreaseQuantity(Food item) {
+    if (item.quantity > 1) {
+      item.quantity--;
+      notifyListeners();
+    }
+  }
 }

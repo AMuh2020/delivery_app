@@ -232,8 +232,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   );
                 }
                 // show a loading spinner while the data is being fetched
-                return const SliverToBoxAdapter(
-                  child: CircularProgressIndicator(),
+                return  SliverToBoxAdapter(
+                  child: Expanded(
+                    child: Container(
+                      child: Center(
+                        child: CircularProgressIndicator()
+                      )
+                    ),
+                  ),
                 );
               },
             ),

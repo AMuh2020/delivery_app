@@ -187,7 +187,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
       future: addons,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          print(snapshot.data!);  
+          print("1. ${snapshot.data!}");  
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
@@ -198,7 +198,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
                   value: checkboxStates[index], 
                   onChanged: (bool? value) {
                     setState(() {
-                      print(value);
+                      print("2. $value");
                       checkboxStates[index] = value!;
                       if (value == true) {
                         addToTotal(snapshot.data![index].price);
@@ -236,25 +236,26 @@ class _MenuItemPageState extends State<MenuItemPage> {
           builder: (context, model, child) {
             return ElevatedButton(
               onPressed: () {
+                print("4 ${selectedAddons}");
                 // Add to cart
-                for (int i = 0; i < quantity; i++) {
-                  model.add(
-                    // add the original Food object but with the addons
-                    // addons of true are added to the addons list
-                    Food(
-                      id: widget.menuItemData.id,
-                      inventory: widget.menuItemData.inventory,
-                      name: widget.menuItemData.name,
-                      description: widget.menuItemData.description,
-                      price: widget.menuItemData.price + addonsTotalPrice,
-                      image: widget.menuItemData.image,
-                      createdAt: widget.menuItemData.createdAt,
-                      updatedAt: widget.menuItemData.updatedAt,
-                      restaurant: widget.menuItemData.restaurant,
-                      addons: selectedAddons,
-                    )
-                  );
-                }
+                model.add(
+                  // add the original Food object but with the addons
+                  // addons of true are added to the addons list
+                  Food(
+                    id: widget.menuItemData.id,
+                    inventory: widget.menuItemData.inventory,
+                    name: widget.menuItemData.name,
+                    description: widget.menuItemData.description,
+                    price: widget.menuItemData.price + addonsTotalPrice,
+                    image: widget.menuItemData.image,
+                    createdAt: widget.menuItemData.createdAt,
+                    updatedAt: widget.menuItemData.updatedAt,
+                    restaurant: widget.menuItemData.restaurant,
+                    addons: selectedAddons,
+                    quantity: quantity,
+                  )
+                );
+                
                 // add the items in the list to the checkout model
                 // for (var item in toCheckoutItems) {
                 //   model.add(item);

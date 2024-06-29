@@ -25,7 +25,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Checkout Page'),
+        title: Text('Cart'),
       ),
       body: Consumer<CheckoutModel>(
         builder: (context, model, child) {
@@ -45,7 +45,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               children: <Widget>[
                                 Expanded(
                                   child: Text(
-                                    model.checkoutItems[index].name,
+                                    "${model.checkoutItems[index].name}  x${model.checkoutItems[index].quantity}",
                                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                   )
                                 ),
@@ -53,7 +53,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      '₦${model.checkoutItems[index].price}'+' x ${model.checkoutItems[index].addons.length}',
+                                      '₦${model.checkoutItems[index].price * model.checkoutItems[index].quantity}',
                                       style: TextStyle(fontSize: 20),
                                     ),
                                     IconButton(
@@ -70,13 +70,36 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ListView.builder(
                               itemCount: model.checkoutItems[index].addons.length,
                               itemBuilder: (context, addonIndex) {
-                                print('Addon Index: $addonIndex');
+                                // print('Addon Index: $addonIndex');
                                 final addon = model.checkoutItems[index].addons[addonIndex];
                                 return Text(addon.name); // Display each addon's name
                               },
                               physics: NeverScrollableScrollPhysics(), // Prevents the ListView from scrolling independently
                               shrinkWrap: true, // Allows ListView to size itself according to its children
-                            )
+                            ),
+                            // quantity
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                children: [
+                                  Text('Quantity: '),
+                                  IconButton(
+                                    onPressed: () {
+                                      model.increaseQuantity(model.checkoutItems[index]);
+                                    },
+                                    icon: Icon(Icons.add),
+                                  ),
+                                  Text('${model.checkoutItems[index].quantity}'),
+                                  IconButton(
+                                    onPressed: () {
+                                      model.decreaseQuantity(model.checkoutItems[index]);
+                                    },
+                                    icon: Icon(Icons.remove),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Divider(),
                           ],
                         ),
                       );
@@ -95,8 +118,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         // backgroundColor: Theme.of(context).colorScheme.secondary,
                       ),
                       onPressed: () {
-                        // Add your checkout logic here
                         print('Checkout pressed');
+                        // todo: implement checkout
+                        // show payment dialog with total - paystack/stripe
+                        // reject payment if restaurant rejects order
+                        // if payment is successful, send order to restaurant
+                        // add order to order history
+                        // get a driver to deliver order
+                        // notify user of delivery time in order history page and homepage + notification
                       },
                       child: Text('Checkout'),
                     ),

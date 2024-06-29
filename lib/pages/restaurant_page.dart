@@ -4,7 +4,7 @@ import 'package:delivery_app/components/my_description_box.dart';
 import 'package:delivery_app/components/my_drawer.dart';
 import 'package:delivery_app/components/restaurant_app_bar.dart';
 import 'package:delivery_app/components/my_tab_bar.dart';
-import 'package:delivery_app/pages/checkout_page.dart';
+import 'package:delivery_app/pages/cart_page.dart';
 import 'package:flutter/material.dart';
 import 'package:delivery_app/models/food.dart';
 import 'package:http/http.dart' as http;
