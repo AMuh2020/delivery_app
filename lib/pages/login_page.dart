@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   void login() {
     // todo: implement login
 
-    // go to home page
+    // for now go to home page
     Navigator.push(
       context,
       MaterialPageRoute(

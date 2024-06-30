@@ -236,7 +236,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
           builder: (context, model, child) {
             return ElevatedButton(
               onPressed: () {
-                print("4 ${selectedAddons}");
+                // print("4 ${selectedAddons}");
                 // Add to cart
                 model.add(
                   // add the original Food object but with the addons

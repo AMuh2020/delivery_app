@@ -1,7 +1,7 @@
 import 'package:delivery_app/components/menu_list_item.dart';
-import 'package:delivery_app/components/my_current_location.dart';
-import 'package:delivery_app/components/my_description_box.dart';
-import 'package:delivery_app/components/my_drawer.dart';
+import 'package:delivery_app/components/current_location.dart';
+import 'package:delivery_app/components/delivery_info_box.dart';
+import 'package:delivery_app/components/home_page_drawer.dart';
 import 'package:delivery_app/components/restaurant_app_bar.dart';
 import 'package:delivery_app/components/my_tab_bar.dart';
 import 'package:delivery_app/pages/cart_page.dart';
@@ -27,9 +27,6 @@ class RestaurantPage extends StatefulWidget {
 }
 
 class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProviderStateMixin{
-
-
-
   late Future<List<Food>> menuItems;
 
   // array for checkout items
@@ -96,8 +93,8 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
         },
         child: Column(
           children: [
-            const MyCurrentLocation(),
-            const MyDescriptionBox(),
+            const CurrentLocation(),
+            const DeliveryInfoBox(),
             Flexible(
               child: FutureBuilder<List<Food>>(
                 future: menuItems,

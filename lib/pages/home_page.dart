@@ -1,8 +1,7 @@
 import 'dart:convert';
-
-import 'package:delivery_app/components/my_current_location.dart';
-import 'package:delivery_app/components/my_description_box.dart';
-import 'package:delivery_app/components/my_drawer.dart';
+import 'package:delivery_app/components/current_location.dart';
+import 'package:delivery_app/components/delivery_info_box.dart';
+import 'package:delivery_app/components/home_page_drawer.dart';
 import 'package:delivery_app/components/my_tab_bar.dart';
 import 'package:delivery_app/components/restaurant_list_item.dart';
 import 'package:delivery_app/components/resturant_search_bar.dart';
@@ -10,6 +9,7 @@ import 'package:delivery_app/models/food.dart';
 import 'package:delivery_app/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,71 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin{
-
-  // tab controller
-  // late TabController _tabController;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _tabController = TabController(length: 3, vsync: this);
-  // }
-
-  // @override
-  // void dispose() {
-  //   _tabController.dispose();
-  //   super.dispose();
-  // }
-
-  // temp data (will be fetched from the server, may independently fetch resturants
-  // and food items once the user selects a resturant)
-  // List<Restaurant> restaurants = [
-  //   Restaurant(
-  //     name: "Restaurant 1",
-  //     description: "Resturant 1 description",
-  //     address: "address 1",
-  //     imagePaths: ["assets/images/resturants/previews/img1.png",],
-  //     menu: [
-  //       Food(
-  //         name: "name",
-  //         description: "description",
-  //         price: 10.0,
-  //         imagePath: "assets/images/food/previews/img1.png",
-  //         category: FoodCategory.burger,
-  //         availableAddons: [
-  //           Addon(
-  //             name: "Extra cheese",
-  //             price: 1.0,
-  //           ),
-  //         ],
-  //       ),
-  //     ],
-  //   ),
-  //   Restaurant(
-  //     name: "Restaurant 2",
-  //     description: "Resturant 2 description",
-  //     address: "address 2",
-  //     imagePaths: ["assets/images/resturants/previews/img1.png",],
-  //     menu: [
-  //       Food(
-  //         name: "PIZZA!!!",
-  //         description: "super delicious pizza",
-  //         price: 30.0,
-  //         imagePath: "assets/images/food/previews/img1.png",
-  //         category: FoodCategory.pizza,
-  //         availableAddons: [
-  //           Addon(
-  //             name: "Extra cheese",
-  //             price: 1.0,
-  //           ),
-  //         ],
-  //       ),
-  //     ],
-  //   ),
-  // ];
-
-  // list of resturants
-  List<Restaurant> restaurants = [];
+  
 
   // future to fetch resturants
   late Future<List<Restaurant>> futureRestaurants;
@@ -109,17 +45,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  // list of filtered resturants
-  List<String> _filteredRestaurants = [];
-
-  
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: Theme.of(context).colorScheme.surface,
-      drawer: MyDrawer(),
+      drawer: HomePageDrawer(),
       body: RefreshIndicator( // pull to refresh, fetch resturants again
         onRefresh: () async {
           setState(() {
@@ -142,7 +72,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       // current location
-                      const MyCurrentLocation(),
+                      CurrentLocation(),
                     ]
                   ),
                 ),
@@ -159,13 +89,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       // search for resturants
                       print("HELLO!!!");
                       print(value);
+                      // todo
                       // filter resturants
-                      if (value.isEmpty) {
-                        _filteredRestaurants = [];
-                      } else {
-                        _filteredRestaurants = restaurants.where((element) => element.name.toLowerCase().contains(value.toLowerCase())).map((e) => e.name).toList();
-                      }
-                      print(_filteredRestaurants);
+                      
                     },
                     builder: (BuildContext context, SearchController searchController) {
                       return SearchBar(
@@ -180,23 +106,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     },
                     
                     // implement auto complete at some point
-                    // https://api.flutter.dev/flutter/material/Autocomplete-class.html
                     suggestionsBuilder: (BuildContext context, SearchController controller) {
-                      if (_filteredRestaurants.isEmpty) {
-                        // Return a list with a single item indicating no suggestions
-                        return [
-                          ListTile(
-                            title: Text('No suggestions found'),
-                          ),
-                        ];
-                      } else {
-                        // Return the list of suggestions
-                        return _filteredRestaurants.map((String suggestion) {
-                          return ListTile(
-                            title: Text(suggestion),
-                          );
-                        }).toList();
-                      }
+                      // todo
+                      // implement auto complete
+                      return [];
                     }
                   ),
                 ),
@@ -232,14 +145,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   );
                 }
                 // show a loading spinner while the data is being fetched
-                return  SliverToBoxAdapter(
-                  child: Expanded(
-                    child: Container(
-                      child: Center(
-                        child: CircularProgressIndicator()
-                      )
-                    ),
-                  ),
+                return const  SliverToBoxAdapter(
+                  child: Center(
+                    child: CircularProgressIndicator()
+                  )
                 );
               },
             ),

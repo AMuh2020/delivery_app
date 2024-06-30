@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 // to do: data from the server
 // to do: make the delivery fee and delivery time dynamic
 // delivery fee based on calculations
-class MyDescriptionBox extends StatelessWidget {
-  const MyDescriptionBox({super.key});
+class DeliveryInfoBox extends StatelessWidget {
+  const DeliveryInfoBox({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -42,13 +42,6 @@ class Food {
   }
 }
 
-// food categories
-enum FoodCategory {
-  burger,
-  pizza,
-  sushi,
-  drink,
-}
 
 // food addons
 class Addon {

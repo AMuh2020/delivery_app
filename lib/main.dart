@@ -28,13 +28,15 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => CheckoutModel()),
+        ChangeNotifierProvider(create: (context) => AddressModel()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,6 +49,7 @@ class MyApp extends StatelessWidget {
 }
 
 class CheckoutModel extends ChangeNotifier {
+  // array for checkout items
   List<Food> checkoutItems = [];
 
   void add(Food item) {
@@ -68,5 +71,26 @@ class CheckoutModel extends ChangeNotifier {
       item.quantity--;
       notifyListeners();
     }
+  }
+}
+
+class AddressModel with ChangeNotifier {
+  String? _address;
+
+  // Singleton
+  static final AddressModel _instance = AddressModel._internal();
+  factory AddressModel() {
+    return _instance;
+  }
+  AddressModel._internal();
+
+  // Singleton accessor
+  static AddressModel get instance => _instance;
+
+  String? get address => _address;
+
+  void setAddress(String? newAddress) {
+    _address = newAddress;
+    notifyListeners();
   }
 }
