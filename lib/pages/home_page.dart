@@ -10,6 +10,8 @@ import 'package:delivery_app/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
+import 'package:delivery_app/globals.dart' as globals;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,7 +34,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   // function to fetch resturants from the server
   Future<List<Restaurant>> fetchRestaurants() async {
-    final response = await http.get(Uri.parse('http://192.168.0.100:8000/restaurants/'));
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse('${globals.serverUrl}/restaurants/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Token ${prefs.getString('auth_token')}',
+      },
+    );
     
     if (response.statusCode == 200) {
       // If the server returns an OK response, then parse the JSON.

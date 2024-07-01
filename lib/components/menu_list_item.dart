@@ -37,7 +37,7 @@ class MenuItem extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).colorScheme.secondary,
+            // color: Theme.of(context).colorScheme.secondary,
           ),
           height: 300, // Set the height of the image
           width: 100,
@@ -62,12 +62,12 @@ class MenuItem extends StatelessWidget {
               Flexible(
                 flex: 1,
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(10.0),
                       bottomRight: Radius.circular(10.0),
                     ),
-                    color: Color.fromARGB(255, 51, 49, 49),
+                    color: Theme.of(context).colorScheme.primaryContainer,
                   ),
                   width: MediaQuery.of(context).size.width,
                   child: Padding(

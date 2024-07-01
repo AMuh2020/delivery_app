@@ -4,9 +4,17 @@ import 'package:flutter/material.dart';
 // to do: data from the server
 // to do: make the delivery fee and delivery time dynamic
 // delivery fee based on calculations
-class DeliveryInfoBox extends StatelessWidget {
+class DeliveryInfoBox extends StatefulWidget {
   const DeliveryInfoBox({super.key});
 
+  @override
+  State<DeliveryInfoBox> createState() => _DeliveryInfoBoxState();
+}
+
+class _DeliveryInfoBoxState extends State<DeliveryInfoBox> {
+  // Delivery fee will be a constant but will come from server
+  // Delivery time will be determined by the server using google maps api??
+  // or restaurant's estimated prep time + delivery time
   @override
   Widget build(BuildContext context) {
 
@@ -21,7 +29,7 @@ class DeliveryInfoBox extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.background,
+        // color: Theme.of(context).colorScheme.surface,
         border: Border.all(
           color: Theme.of(context).colorScheme.secondary,
         ),
@@ -39,7 +47,6 @@ class DeliveryInfoBox extends StatelessWidget {
               Text("Delivery fee", style: mySecondaryTextStyle),
             ],
           ),
-
           // delivery time
           Column(
             children: [

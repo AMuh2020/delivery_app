@@ -1,6 +1,11 @@
 import 'package:delivery_app/components/my_button.dart';
 import 'package:delivery_app/components/my_textfield.dart';
+import 'package:delivery_app/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:delivery_app/globals.dart' as globals;
+
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
@@ -12,10 +17,54 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   // text editing controllers
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
+  // register function
+  Future<void> register() async {
+    final bool registrationSuccess = await performRegistration(
+      usernameController.text,
+      phoneNumberController.text,
+      emailController.text,
+      passwordController.text,
+      confirmPasswordController.text,
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginPage(onTap: widget.onTap),
+      )
+    );
+
+    return;
+    
+  }
+  Future<bool> performRegistration(String username, String phoneNumber, String email, String password, String confirmPassword) async {
+    // api call to register
+    final response = await http.post(
+      Uri.parse('${globals.serverUrl}/api/signup/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'username': username,
+        'phone_number': phoneNumber,
+        'email': email,
+        'password': password,
+      }),
+    );
+    if (response.statusCode == 200) {
+      // If the server returns an OK response, then parse the JSON.
+      final parsed = jsonDecode(response.body);
+      print(parsed);
+      return true;
+    }
+    return false;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +89,20 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             const SizedBox(height: 25),
+            // username textfield
+            MyTextField(
+              controller: usernameController,
+              hintText: "Username",
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            // phone number textfield
+            MyTextField(
+              controller: phoneNumberController,
+              hintText: "Phone Number",
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
             // email textfield
             MyTextField(
               controller: emailController,
@@ -67,7 +130,44 @@ class _RegisterPageState extends State<RegisterPage> {
             MyButton(
               text: "Sign Up",
               onTap: () {
-                print('register button pressed');
+                // username check
+                if (usernameController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Username cannot be empty"),
+                    ),
+                  );
+                  return;
+                }
+                // phone number check
+                if (phoneNumberController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Phone number cannot be empty"),
+                    ),
+                  );
+                  return;
+                }
+                // email check
+                if (emailController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Email cannot be empty"),
+                    ),
+                  );
+                  return;
+                }
+                // password match check
+                if (passwordController.text != confirmPasswordController.text) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Passwords do not match"),
+                    ),
+                  );
+                  return;
+                }
+                register();
+                
               },
             ),
 

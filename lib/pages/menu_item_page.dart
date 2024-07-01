@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuItemPage extends StatefulWidget {
   final Food menuItemData;
@@ -43,7 +44,14 @@ class _MenuItemPageState extends State<MenuItemPage> {
   List<Food> toCheckoutItems = [];
 
   Future<List<Addon>> fetchAddons() async {
-    final response = await http.get(Uri.parse('http://192.168.0.100:8000/fooditems/${widget.menuItemData.id}/addons/'));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response = await http.get(
+      Uri.parse('http://192.168.0.100:8000/fooditems/${widget.menuItemData.id}/addons/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Token ${prefs.getString('auth_token')}',
+      },
+    );
 
     if (response.statusCode == 200) {
       // If the server returns an OK response, then parse the JSON.

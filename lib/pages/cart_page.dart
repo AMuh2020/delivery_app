@@ -119,15 +119,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ),
                       onPressed: () {
                         print('Checkout pressed');
+                        if (model.subtotal == 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Cart is empty'),
+                            ),
+                          );
+                          return;
+                        }
                         // todo: implement checkout
                         // show payment dialog with total - paystack/stripe
+                        // stripe happens on backend
                         // reject payment if restaurant rejects order
                         // if payment is successful, send order to restaurant
                         // add order to order history
                         // get a driver to deliver order
                         // notify user of delivery time in order history page and homepage + notification
                       },
-                      child: Text('Checkout'),
+                      child: Text('Confirm Order and Pay'),
                     ),
                   ],
                 ),
