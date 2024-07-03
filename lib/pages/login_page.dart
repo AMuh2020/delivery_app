@@ -84,11 +84,16 @@ class _LoginPageState extends State<LoginPage> {
       // this is the token we will use to authenticate future requests
       String authToken = user['auth_token'];
       prefs.setString('auth_token', authToken);
-      // int id = user['id'];
-      // // String username = user['username'];
-      // String email = user['email'];
-      // String phoneNumber = user['phone_number'];
-      // String address = user['address']; 
+      int id = user['id'];
+      prefs.setInt('userID', id);
+      String username = user['username'];
+      prefs.setString('username', username);
+      String email = user['email'];
+      prefs.setString('email', email);
+      String phoneNumber = user['phone_number'];
+      prefs.setString('phone_number', phoneNumber);
+      String address = user['address']; 
+      prefs.setString('address', address);
       print(response.statusCode);
       return true;
     } else {

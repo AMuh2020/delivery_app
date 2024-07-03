@@ -2,6 +2,7 @@ import 'package:delivery_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CurrentLocation extends StatefulWidget {
   const CurrentLocation({super.key});
@@ -49,14 +50,41 @@ class _CurrentLocationState extends State<CurrentLocation> {
     setState(() {
       _address = "Loading...";
     });
-
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     print(position);
+    prefs.setStringList('lat_long', [position.latitude.toString(), position.longitude.toString()]);
     // use geocoder to get the address
-    final List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+    final placemarks = await getPlacemark(position.latitude, position.longitude);
     print(placemarks);
+
+    setState(() {
+      _address = placemarks[0].street.toString();
+      _addressController.text = _address!;
+      addressInstance.setAddress(_address!);
+    });
+  }
+  Future<List<Placemark>> getPlacemark(double lat, double long) async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
+    return placemarks;
+  }
+  Future<void> getAddress() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> latLong;
+    try {
+      latLong = prefs.getStringList('lat_long')!;
+    } catch (e) {
+      // Handle the exception, e.g., log the error or set a default value
+      print('Error fetching lat_long: $e');
+      return;
+    }
+    
+    double lat = double.parse(latLong[0]);
+    double long = double.parse(latLong[1]);
+    final placemarks = await getPlacemark(lat, long);
     setState(() {
       _address = placemarks[0].street.toString();
       _addressController.text = _address!;
@@ -75,6 +103,8 @@ class _CurrentLocationState extends State<CurrentLocation> {
       _address = addressInstance.address;
       _addressController.text = _address!;
       print(_address);
+    } else {
+      getAddress();
     }
   }
 

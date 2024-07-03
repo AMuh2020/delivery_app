@@ -49,6 +49,18 @@ class MyApp extends StatelessWidget {
 }
 
 class CheckoutModel extends ChangeNotifier {
+  // Private constructor
+  CheckoutModel._internal();
+
+  // The single instance of CheckoutModel
+  static final CheckoutModel _instance = CheckoutModel._internal();
+  factory CheckoutModel() {
+    return _instance;
+  }
+
+  // Getter to access the single instance of CheckoutModel
+  static CheckoutModel get instance => _instance;
+
   // array for checkout items
   List<Food> checkoutItems = [];
 
@@ -71,6 +83,10 @@ class CheckoutModel extends ChangeNotifier {
       item.quantity--;
       notifyListeners();
     }
+  }
+  void clearCheckoutItems() {
+    checkoutItems.clear();
+    notifyListeners();
   }
 }
 

@@ -40,21 +40,52 @@ class Food {
       restaurant: json['restaurant'], // id of the restaurant
     );
   }
+  Map<String, dynamic> toJson(Food foodObj) {
+    // Initialize the addons map
+    // Map<String, dynamic> addonsMap = {};
+    // for (var addon in foodObj.addons) {
+    //   addonsMap[addon.name] = {
+    //     'id': addon.id,
+    //     'price': addon.price,
+    //   };
+    // }
+    List<Map<String, dynamic>> addonsList = addons.map((addon) => {
+    'id': addon.id,
+    'name': addon.name,
+    'price': addon.price,
+  }).toList();
+
+    // Construct the main data map
+    Map<String, dynamic> data = {
+      'id': foodObj.id,
+      'name': foodObj.name,
+      'price': foodObj.price,
+      // Assuming 'restaurantId' is a separate property you intended to use
+      'restaurant': foodObj.id, 
+      'quantity': foodObj.quantity,
+      'addons': addonsList,
+    };
+
+    return data;
+  }
 }
 
 
 // food addons
 class Addon {
+  final int id;
   final String name;
   final int price;
 
   Addon({
+    required this.id,
     required this.name,
     required this.price,
   });
 
   factory Addon.fromJson(Map<String, dynamic> json) {
     return Addon(
+      id: json['id'],
       name: json['name'],
       price: json['price'],
     );

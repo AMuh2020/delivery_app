@@ -1,4 +1,6 @@
 import 'package:delivery_app/components/my_drawer_tile.dart';
+import 'package:delivery_app/pages/home_page.dart';
+import 'package:delivery_app/pages/orders_page.dart';
 import 'package:delivery_app/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +14,7 @@ class HomePageDrawer extends StatelessWidget {
       child: Column(
         children: [
           // app logo
-          Padding(
+          const Padding(
             padding: const EdgeInsets.only(top: 100.0),
             child: Icon(
               Icons.restaurant,
@@ -20,20 +22,22 @@ class HomePageDrawer extends StatelessWidget {
               // color: Theme.of(context).colorScheme.inversePrimary,
             ),
           ),
-          Padding(
+          const Padding(
             padding: const EdgeInsets.all(25),
             child: Divider(
               // color: Theme.of(context).colorScheme.secondary,
             ),
           ),
-
-          
           // home list tile
           MyDrawerTile(
             icon: Icons.home,
             text: 'Home',
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()), 
+                (Route<dynamic> route) => false,
+              );
             },
           ),
           
@@ -50,10 +54,14 @@ class HomePageDrawer extends StatelessWidget {
             icon: Icons.shopping_cart,
             text: 'Orders',
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const OrdersPage(),
+                ),
+              );
             },
           ),
-
           // settings list tile
           MyDrawerTile(
             icon: Icons.settings,
@@ -76,6 +84,7 @@ class HomePageDrawer extends StatelessWidget {
             icon: Icons.logout,
             text: 'Logout',
             onTap: () {
+
               Navigator.pop(context);
             },
           ),

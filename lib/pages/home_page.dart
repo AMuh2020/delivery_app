@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Future<List<Restaurant>> fetchRestaurants() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.get(
-      Uri.parse('${globals.serverUrl}/restaurants/'),
+      Uri.parse('${globals.serverUrl}/api/restaurants/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Token ${prefs.getString('auth_token')}',
@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     if (response.statusCode == 200) {
       // If the server returns an OK response, then parse the JSON.
       final parsed = jsonDecode(response.body);
+      print(parsed);
       final results = parsed['results'] as List; 
       return results.map<Restaurant>((json) => Restaurant.fromJson(json)).toList();
     } else {
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           slivers: [
             SliverAppBar(
               pinned: true,
-              title: Text("Delivery App"),
+              title: const Text("AMAL Delivery"),
               expandedHeight: 200,
               collapsedHeight: 70,
               centerTitle: true,
