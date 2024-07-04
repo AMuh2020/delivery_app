@@ -53,12 +53,22 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
           });
         }
       } on SocketException {
-        print('no internet');
+        print('cant connect to server');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cant connect to server'),
+          ),
+        );
         setState(() {
           isLoggedIn = false;
         });
       } on TimeoutException {
-        print('timeout');
+        print('cant connect to server');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cant connect to server'),
+          ),
+        );
         setState(() {
           isLoggedIn = false;
         });

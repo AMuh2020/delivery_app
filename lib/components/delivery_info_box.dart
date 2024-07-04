@@ -38,15 +38,15 @@ class _DeliveryInfoBoxState extends State<DeliveryInfoBox> {
       padding: const EdgeInsets.all(25.0),
       margin: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // delivery fee
-          Column(
-            children: [
-              Text("\£3.00", style: myPrimaryTextStyle),
-              Text("Delivery fee", style: mySecondaryTextStyle),
-            ],
-          ),
+          // // delivery fee
+          // Column(
+          //   children: [
+          //     Text("\£3.00", style: myPrimaryTextStyle),
+          //     Text("Delivery fee", style: mySecondaryTextStyle),
+          //   ],
+          // ),
           // delivery time
           Column(
             children: [

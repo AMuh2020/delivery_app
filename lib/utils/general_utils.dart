@@ -12,6 +12,7 @@ void clearCheckout() {
 void clearPreferences() async{
   final prefs = await SharedPreferences.getInstance();
   await prefs.clear();
+  print('cleared preferences');
 }
 
 // list of things stored in shared preferences

@@ -1,15 +1,10 @@
 import 'dart:convert';
 import 'package:delivery_app/components/current_location.dart';
-import 'package:delivery_app/components/delivery_info_box.dart';
 import 'package:delivery_app/components/home_page_drawer.dart';
-import 'package:delivery_app/components/my_tab_bar.dart';
 import 'package:delivery_app/components/restaurant_list_item.dart';
-import 'package:delivery_app/components/resturant_search_bar.dart';
-import 'package:delivery_app/models/food.dart';
 import 'package:delivery_app/models/restaurant.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:geolocator/geolocator.dart';
 import 'package:delivery_app/globals.dart' as globals;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -77,12 +72,28 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               centerTitle: true,
               flexibleSpace: const FlexibleSpaceBar(
                 background: Padding(
-                  padding: const EdgeInsets.only(bottom: 50.0),
+                  padding: EdgeInsets.only(bottom: 50.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       // current location
-                      CurrentLocation(),
+                      Padding(
+                        padding: EdgeInsets.all(25.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Deliver now",
+                              style: TextStyle(
+                                // color: Theme.of(context).colorScheme.primary,
+                                fontSize: 16,
+                              ),
+                            ),
+                            CurrentLocation(),
+                          ],
+                        ),
+                      ),
+                      
                     ]
                   ),
                 ),

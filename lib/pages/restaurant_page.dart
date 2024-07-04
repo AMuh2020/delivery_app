@@ -1,12 +1,7 @@
 import 'package:delivery_app/components/menu_list_item.dart';
 import 'package:delivery_app/components/current_location.dart';
 import 'package:delivery_app/components/delivery_info_box.dart';
-import 'package:delivery_app/components/home_page_drawer.dart';
-import 'package:delivery_app/components/restaurant_app_bar.dart';
-import 'package:delivery_app/components/my_tab_bar.dart';
-import 'package:delivery_app/main.dart';
 import 'package:delivery_app/pages/cart_page.dart';
-import 'package:delivery_app/pages/home_page.dart';
 import 'package:delivery_app/utils/general_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:delivery_app/models/food.dart';
@@ -137,7 +132,22 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
           },
           child: Column(
             children: [
-              const CurrentLocation(),
+              const Padding(
+                padding: EdgeInsets.all(25.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Deliver now",
+                      style: TextStyle(
+                        // color: Theme.of(context).colorScheme.primary,
+                        fontSize: 16,
+                      ),
+                    ),
+                    CurrentLocation(),
+                  ],
+                ),
+              ),
               const DeliveryInfoBox(),
               Flexible(
                 child: FutureBuilder<List<Food>>(

@@ -1,6 +1,9 @@
 // this page is the cart page where users can view their cart and proceed to checkout
+import 'dart:io';
+
 import 'package:delivery_app/main.dart';
 import 'package:delivery_app/models/food.dart';
+import 'package:delivery_app/pages/before_payment_page.dart';
 import 'package:delivery_app/pages/payment_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +14,7 @@ import 'package:delivery_app/globals.dart' as globals;
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({
-    Key? key,
+    super.key, 
   });
 
   @override
@@ -26,36 +29,64 @@ class _CheckoutPageState extends State<CheckoutPage> {
     super.initState();
   }
 
+  // send order to server
   Future<int> processOrder(List<Food> items) async {
     // build a json of orders and order items to send to the server
     // converting from Food and Addon objects to json
     final List<Map<String, dynamic>> orders = items.map((e) => e.toJson(e)).toList();
     print(orders);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final response = await http.post(
-      Uri.parse('${globals.serverUrl}/api/create_order'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Token ${prefs.getString('auth_token')}',
-      },
-      body: jsonEncode({
-        'user_id': prefs.getInt('user_id'),
-        'restaurant_id': items[0].restaurant,
-        'order_items': orders,
-      }),
-    );
-    print(response.statusCode);
-    print(response.body);
-    int orderId = jsonDecode(response.body)['order_id'];
-    return orderId;
+    try{
+      final response = await http.post(
+        Uri.parse('${globals.serverUrl}/api/create_order'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Token ${prefs.getString('auth_token')}',
+        },
+        body: jsonEncode({
+          'user_id': prefs.getInt('user_id'),
+          'restaurant_id': items[0].restaurant,
+          'order_items': orders,
+          'delivery_address': AddressModel.instance.address,
+        }),
+      ).timeout(Duration(seconds: 10));
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 201) {
+        int orderId = jsonDecode(response.body)['order_id'];
+        return orderId;
+      } else {
+        // failed to create order
+        return -2;
+      }
+    }on SocketException catch (e) {
+        print(e);
+        // cant connect to server
+        return -1;
+    }
   }
   Future<void> completeOrderAndNavigate(List<Food> checkoutItems) async {
     var orderId = await processOrder(checkoutItems); // Assuming model.checkoutItems is your data
-
+    if (orderId == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Cant connect to server'),
+        ),
+      );
+      return;
+    } else if (orderId == -2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to create order'),
+        ),
+      );
+      return;
+    }
     // After processOrder completes, navigate to the PaymentPage
+    if (!mounted) return;
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => PaymentPage(orderId: orderId)),
+      MaterialPageRoute(builder: (context) => BeforePaymentPage(orderId: orderId)),
     );
   }
 

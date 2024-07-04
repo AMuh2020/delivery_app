@@ -1,5 +1,6 @@
 import 'package:delivery_app/pages/home_page.dart';
 import 'package:delivery_app/pages/orders_page.dart';
+import 'package:delivery_app/utils/general_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -25,7 +26,6 @@ class _PaymentPageState extends State<PaymentPage> {
   // initialize transaction
   Future<List<dynamic>> serverBeginInitialization() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
     // contact server for initialization
     final response = await http.post(
       Uri.parse('${globals.serverUrl}/api/init_transaction'),
@@ -52,7 +52,6 @@ class _PaymentPageState extends State<PaymentPage> {
       Navigator.pop(context);
       return [];
     }
-    
   }
   Future<void> beginInitialization() async {
 
@@ -123,6 +122,7 @@ class _PaymentPageState extends State<PaymentPage> {
           }
           if(request.url.startsWith('https://standard.paystack.co/close')) {
             print('Transaction 3D Secure Completed');
+            clearCheckout();
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => HomePage()), // Replace NewPage with the page you want to navigate to
@@ -132,12 +132,15 @@ class _PaymentPageState extends State<PaymentPage> {
           // callback url
           if (request.url.startsWith('${globals.serverUrl}/api/transaction/success/${reference}')) {
             print('Payment Successful');
+            verifyTransaction(reference);
+            clearCheckout();
             // clear entire navigation stack
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const HomePage()), // Replace NewPage with the page you want to navigate to
               (Route<dynamic> route) => false, // This condition ensures all previous routes are removed
             );
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => OrdersPage()));
             // send a request to the server to verify the transaction
 
             return NavigationDecision.prevent;
@@ -158,7 +161,6 @@ class _PaymentPageState extends State<PaymentPage> {
         'Authorization': 'Token ${prefs.getString('auth_token')}',
       },
       body: json.encode({
-        'user_id': prefs.getInt('user_id'),
         'reference': reference,
       }),
     );
@@ -216,6 +218,8 @@ class _PaymentPageState extends State<PaymentPage> {
           icon: const Icon(Icons.close),
           onPressed: () {
             cancelTransaction(reference);
+            // pop twice to get to the cart page
+            Navigator.pop(context);
             Navigator.pop(context);
           },
         ),
