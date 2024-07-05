@@ -9,13 +9,26 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:delivery_app/globals.dart' as globals;
 
-class HomePageDrawer extends StatelessWidget {
-  const HomePageDrawer({super.key});
+class HomePageDrawer extends StatefulWidget {
+  HomePageDrawer({super.key});
+
+  @override
+  State<HomePageDrawer> createState() => _HomePageDrawerState();
+}
+
+class _HomePageDrawerState extends State<HomePageDrawer> {
+  late SharedPreferences prefs;
+  String username = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getPrefs();
+  }
 
   Future<void> _signout() async {
-    // todo
     // logout user
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    
     final response = await http.post(
       Uri.parse('${globals.serverUrl}/api/signout/'),
       headers: <String, String>{
@@ -35,6 +48,14 @@ class HomePageDrawer extends StatelessWidget {
       // throw Exception('Failed to signout');
     }
   }
+  Future<void> getPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? '';
+    });
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +128,7 @@ class HomePageDrawer extends StatelessWidget {
           ),
 
           const Spacer(),
-
+          Text('Logged in as ${username}'),
           // logout list tile
           MyDrawerTile(
             icon: Icons.logout,

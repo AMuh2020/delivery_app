@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:delivery_app/main.dart';
 import 'package:delivery_app/models/food.dart';
 import 'package:delivery_app/pages/before_payment_page.dart';
-import 'package:delivery_app/pages/payment_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
