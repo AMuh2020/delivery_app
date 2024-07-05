@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:delivery_app/pages/home_page.dart';
 import 'package:delivery_app/pages/login_page.dart';
 import 'package:delivery_app/pages/register_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -93,9 +94,15 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
     });
   }
 
+  Future<void> _intializeFCM() async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    print('fcm token: $fcmToken');
+  }
+
   @override
   void initState() {
     super.initState();
+    _intializeFCM();
     _checkLogin();
   }
 
