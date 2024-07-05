@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "199143172529",
+    "project_id": "amal-delivery",
+    "storage_bucket": "amal-delivery.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199143172529:android:62b8bcce519b70089cb590",
+        "android_client_info": {
+          "package_name": "com.example.delivery_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8hRtEkVZiAX4Fm2KWQo795F7VmxRUzYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

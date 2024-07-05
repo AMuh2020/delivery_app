@@ -18,6 +18,8 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   // text editing controllers
   final TextEditingController usernameController = TextEditingController();
+  final TextEditingController firstnameController = TextEditingController();
+  final TextEditingController lastnameController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -27,23 +29,39 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> register() async {
     final bool registrationSuccess = await performRegistration(
       usernameController.text,
+      firstnameController.text,
+      lastnameController.text,
       phoneNumberController.text,
       emailController.text,
       passwordController.text,
       confirmPasswordController.text,
     );
+    if (registrationSuccess) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Registration successful"),
+        ),
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginPage(onTap: widget.onTap),
+        )
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Registration failed"),
+        ),
+      );
+    }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LoginPage(onTap: widget.onTap),
-      )
-    );
+    
 
     return;
     
   }
-  Future<bool> performRegistration(String username, String phoneNumber, String email, String password, String confirmPassword) async {
+  Future<bool> performRegistration(String username, String firstname,String lastname, String phoneNumber, String email, String password, String confirmPassword) async {
     // api call to register
     final response = await http.post(
       Uri.parse('${globals.serverUrl}/api/signup/'),
@@ -52,12 +70,14 @@ class _RegisterPageState extends State<RegisterPage> {
       },
       body: jsonEncode(<String, String>{
         'username': username,
+        'first_name': firstname,
+        'last_name': lastname,
         'phone_number': phoneNumber,
         'email': email,
         'password': password,
       }),
     );
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       // If the server returns an OK response, then parse the JSON.
       final parsed = jsonDecode(response.body);
       print(parsed);
@@ -74,14 +94,14 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Logo
-            Icon(
+            const Icon(
               Icons.lock_open_rounded,
               size: 100,
               // color: Theme.of(context).colorScheme.inversePrimary,
             ),
             const SizedBox(height: 25),
             // message, app slogan
-            Text(
+            const Text(
               "Let's create an account!",
               style: TextStyle(
                 // color: Theme.of(context).colorScheme.inversePrimary,
@@ -93,6 +113,20 @@ class _RegisterPageState extends State<RegisterPage> {
             MyTextField(
               controller: usernameController,
               hintText: "Username",
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            // first name textfield
+            MyTextField(
+              controller: firstnameController,
+              hintText: "First Name",
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            // last name textfield
+            MyTextField(
+              controller: lastnameController,
+              hintText: "Last Name",
               obscureText: false,
             ),
             const SizedBox(height: 10),

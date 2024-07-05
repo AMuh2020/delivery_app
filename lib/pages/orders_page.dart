@@ -15,10 +15,10 @@ class OrdersPage extends StatefulWidget {
 
 class _OrdersPageState extends State<OrdersPage> {
 
+  late Future<List<Order>> futureOrder;
+
   Future<List<Order>> fetchOrders() async {
-    // for (Order order in orders) {
-    //   // fetch order details
-    // }
+    print('fetching orders');
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.get(
       Uri.parse('${globals.serverUrl}/api/orders/user_orders/'),
@@ -38,41 +38,91 @@ class _OrdersPageState extends State<OrdersPage> {
       throw Exception('Failed to load orders');
     }
   }
+  @override
+  void initState() {
+    super.initState();
+    futureOrder = fetchOrders();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: HomePageDrawer(),
-      appBar: AppBar(
-        title: const Text('Orders'),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            fetchOrders();
-          });
-          await fetchOrders();
-        },
-        child: FutureBuilder(
-          future: fetchOrders(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Text(snapshot.data[index].restaurantName),
-                    subtitle: Text(snapshot.data[index].status),
-                    trailing: Text(snapshot.data[index].total.toString()),
-                  );
-                },
-              );
-            }
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        drawer: HomePageDrawer(),
+        appBar: AppBar(
+          title: const Text('Orders'),
+          bottom: TabBar(
+            tabs: [
+              Tab(text: 'In Progress'),
+              Tab(text: 'Completed'),
+            ],
+          )
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              futureOrder = fetchOrders();
+            });
+            await futureOrder;
           },
+          child: FutureBuilder(
+            future: futureOrder,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                var inProgressTerms = ['cooking', 'delivering'];
+                var inProgressOrders = snapshot.data.where((order) => inProgressTerms.contains(order.status)).toList();
+                var completedTerms = ['completed', 'cancelled'];
+                var completedOrders = snapshot.data.where((order) => completedTerms.contains(order.status)).toList();
+                return TabBarView(
+                  children: [
+                    // in progress orders
+                    RefreshIndicator(
+                      onRefresh: () async {
+                        setState(() {
+                          futureOrder = fetchOrders();
+                        });
+                        await futureOrder;
+                      },
+                      child: ListView.builder(
+                        itemCount: inProgressOrders.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text('Order ID: ${inProgressOrders[index].id}'),
+                            subtitle: Text('Status: ${inProgressOrders[index].status}'),
+                            trailing: Text('Total: ${inProgressOrders[index].total}'),
+                          );
+                        },
+                      ),
+                    ),
+                    // completed orders
+                    RefreshIndicator(
+                      onRefresh: () async {
+                        setState(() {
+                          futureOrder = fetchOrders();
+                        });
+                        await futureOrder;
+                      },
+                      child: ListView.builder(
+                        itemCount: completedOrders.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text('Order ID: ${completedOrders[index].id}'),
+                            subtitle: Text('Status: ${completedOrders[index].status}'),
+                            trailing: Text('Total: ${completedOrders[index].total}'),
+                          );
+                        },
+                      ),
+                    ),
+                  ]
+                );
+              }
+            },
+          ),
         ),
       ),
     );

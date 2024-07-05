@@ -150,40 +150,25 @@ class _CurrentLocationState extends State<CurrentLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(25.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: () => openLocationSearchBox(context),
+      child: Row(
         children: [
+          // address
           Text(
-            "Deliver now",
+            "${_address ?? 'Click here to input address'}",
             style: TextStyle(
-              // color: Theme.of(context).colorScheme.primary,
+              // color: Theme.of(context).colorScheme.inversePrimary,
               fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          GestureDetector(
-            onTap: () => openLocationSearchBox(context),
-            child: Row(
-              children: [
-                // address
-                Text(
-                  "${_address ?? 'Click here to input address'}",
-                  style: TextStyle(
-                    // color: Theme.of(context).colorScheme.inversePrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              
-                //drop down menu
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  // color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-              ],
-            ),
-          )
+        
+          //drop down menu
+          Icon(
+            Icons.keyboard_arrow_down_rounded,
+            // color: Theme.of(context).colorScheme.inversePrimary,
+          ),
         ],
       ),
     );

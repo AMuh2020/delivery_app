@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:delivery_app/components/my_button.dart';
 import 'package:delivery_app/components/my_textfield.dart';
 import 'package:delivery_app/pages/home_page.dart';
@@ -55,48 +56,53 @@ class _LoginPageState extends State<LoginPage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     bool hasAuthToken = prefs.getString('auth_token')?.isNotEmpty ?? false;
-    final response = await http.post(
-      Uri.parse('${globals.serverUrl}/api/signin/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String , String>{
-        'username': username,
-        'password': password,
-        'has_token': hasAuthToken.toString(),
-      }),
-    );
-    
-    if (response.statusCode == 200) {
-      // in the future use JWT or some other token -Django rest token
-      // for now store username in shared preferences
-      // prefs.setString('username', username);
-      var responseData = jsonDecode(response.body);
+    try {
+      final response = await http.post(
+        Uri.parse('${globals.serverUrl}/api/signin/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String , String>{
+          'username': username,
+          'password': password,
+          'has_token': hasAuthToken.toString(),
+        }),
+      );
+      
+      if (response.statusCode == 200) {
+        // in the future use JWT or some other token -Django rest token
+        // for now store username in shared preferences
+        // prefs.setString('username', username);
+        var responseData = jsonDecode(response.body);
 
-      // Accessing the message
-      String message = responseData['message'];
+        // Accessing the message
+        String message = responseData['message'];
 
-      // Accessing user information
-      var user = responseData['user'];
-      print(user);
+        // Accessing user information
+        var user = responseData['user'];
+        print(user);
 
-      // access the auth token
-      // this is the token we will use to authenticate future requests
-      String authToken = user['auth_token'];
-      prefs.setString('auth_token', authToken);
-      int id = user['id'];
-      prefs.setInt('userID', id);
-      String username = user['username'];
-      prefs.setString('username', username);
-      String email = user['email'];
-      prefs.setString('email', email);
-      String phoneNumber = user['phone_number'];
-      prefs.setString('phone_number', phoneNumber);
-      String address = user['address']; 
-      prefs.setString('address', address);
-      print(response.statusCode);
-      return true;
-    } else {
+        // access the auth token
+        // this is the token we will use to authenticate future requests
+        String authToken = user['auth_token'];
+        prefs.setString('auth_token', authToken);
+        int id = user['id'];
+        prefs.setInt('userID', id);
+        String username = user['username'];
+        prefs.setString('username', username);
+        String email = user['email'];
+        prefs.setString('email', email);
+        String phoneNumber = user['phone_number'];
+        prefs.setString('phone_number', phoneNumber);
+        // String address = user['address']; 
+        // prefs.setString('address', address);
+        print(response.statusCode);
+        return true;
+      } else {
+        return false;
+      }
+    } on SocketException catch (e) {
+      print(e);
       return false;
     }
   }
@@ -111,12 +117,11 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // logo
-            Icon(
+            const Icon(
               Icons.lock_open_rounded,
               size: 72,
               // color: Theme.of(context).colorScheme.inversePrimary,
             ),
-
             const SizedBox(height: 25),
             // message, app slogan
             Text(
