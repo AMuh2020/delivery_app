@@ -33,7 +33,7 @@ class RestaurantListItem extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.0),
-              color: Theme.of(context).colorScheme.secondary,
+              // color: Theme.of(context).colorScheme.secondary,
             ),
             child: Column(
               children: [
@@ -56,12 +56,12 @@ class RestaurantListItem extends StatelessWidget {
                 Flexible(
                   flex: 9,
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(10.0),
                         bottomRight: Radius.circular(10.0),
                       ),
-                      color: Color.fromARGB(255, 51, 49, 49),
+                      color: Theme.of(context).colorScheme.primaryContainer,
                     ),
                     width: MediaQuery.of(context).size.width,
                     child: Padding(

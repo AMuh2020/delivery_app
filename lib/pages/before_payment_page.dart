@@ -11,9 +11,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class BeforePaymentPage extends StatefulWidget {
   final int orderId;
+  final double serviceFee;
+  final double deliveryFee;
+  final double subtotal;
+  final double total;
   const BeforePaymentPage({
     super.key,
     required this.orderId,
+    required this.serviceFee,
+    required this.deliveryFee,
+    required this.subtotal,
+    required this.total,
   });
 
   @override
@@ -23,6 +31,15 @@ class BeforePaymentPage extends StatefulWidget {
 class _BeforePaymentPageState extends State<BeforePaymentPage> {
   Timer? _timer;
   String message = 'Please wait while we check if the restaurant can accept your order.';
+  Widget messageWidget = const Column(
+    children: [
+      Text(
+        'Please wait while we check if the restaurant can accept your order.',
+      ),
+      Center(child: CircularProgressIndicator()),
+    ],
+  );
+  bool restaurantAccept = false;
 
   final addressInstance = AddressModel.instance;
 
@@ -49,19 +66,18 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
         // Navigator.of(context).pop();
         // // then navigate to payment page
         print('Order accepted');
-        final locationConfirmed = await locationConfirmDialog() ?? false;
-        if (locationConfirmed) {
-          print('Location confirmed');
-          if (context.mounted) {
-            print('Navigating to payment page');
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentPage(orderId: widget.orderId),
+          setState(() {
+          messageWidget = const Column(
+            children: [
+              Text(
+                'Order was accepted by the Restaurant. Proceed to payment',
               ),
-            );
-          }
-        }
+            ],
+          );
+          restaurantAccept = true;
+        });
+          
+        
         // Navigator.push(
         //   context,
         //   MaterialPageRoute(
@@ -71,12 +87,24 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
       } else if (status == 'rejected') {
         timer.cancel();
         setState(() {
-          message = 'Order was rejected by the restaurant';
+          messageWidget = const Column(
+            children: [
+              Text(
+                'Order was rejected by the restaurant. Reason: ...',
+              ),
+            ],
+          );
         });
       } else if (status == 'error') {
         timer.cancel();
         setState(() {
-          message = 'There was an error checking the order status';
+          messageWidget = const Column(
+            children: [
+              Text(
+                'There was an error checking the order status, please cancel order and order again',
+              ),
+            ],
+          );
         });
       }
     });
@@ -199,18 +227,82 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
             children: [
               Text(
                 'Order ID: ${widget.orderId}',
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               // location
               // Text(
               //   'Address: ${addressInstance.address}',
               //   style: Theme.of(context).textTheme.bodyLarge,
               // ),
-              Text(
-                '$message',
+              messageWidget,
+              Divider(),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Subtotal'),
+                        Text('${widget.subtotal}')
+                      ],
+                    ),
+                    Text('Fees'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Service'),
+                        Text('${widget.serviceFee}')
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Delivery'),
+                        Text('${widget.deliveryFee}')
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total',
+                          style:  Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        Text(
+                          '${widget.total}',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        )
+                      ],
+                    ),
+                  ]
+                ),
               ),
-              const CircularProgressIndicator(),
-              const Spacer()
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: restaurantAccept ? () async { //if condition isn't met button is null and unselectable
+                        final locationConfirmed = await locationConfirmDialog() ?? false;
+                        if (locationConfirmed && context.mounted) {
+                          print('Location confirmed');
+                          print('Navigating to payment page');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PaymentPage(orderId: widget.orderId),
+                            ),
+                          );
+                        }
+                        return;
+                      } : null,
+                      child: Text('Proceed to payment')
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

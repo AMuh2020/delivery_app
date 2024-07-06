@@ -1,9 +1,10 @@
+import 'package:decimal/decimal.dart';
 import 'package:delivery_app/models/food.dart';
 import 'package:flutter/material.dart';
 
 class AddonsListItem extends StatefulWidget {
   final String name;
-  final int price;
+  final Decimal price;
   Widget checkbox; 
 
   AddonsListItem({

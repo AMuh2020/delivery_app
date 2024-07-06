@@ -1,5 +1,6 @@
 
 
+import 'package:decimal/decimal.dart';
 import 'package:delivery_app/auth/login_or_register.dart';
 import 'package:delivery_app/models/food.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +81,7 @@ class CheckoutModel extends ChangeNotifier {
     checkoutItems.remove(item);
     notifyListeners();
   }
-  int get subtotal => checkoutItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+  Decimal get subtotal => checkoutItems.fold<Decimal>(Decimal.zero, (sum, item) => sum + item.price * Decimal.fromInt(item.quantity));
 
   void increaseQuantity(Food item) {
     item.quantity++;

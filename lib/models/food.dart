@@ -1,9 +1,10 @@
+import 'package:decimal/decimal.dart';
 class Food {
   final int id;
   final int inventory;
   final String name;
   final String description;
-  final int price;
+  final Decimal price;
   final String image;
   final String createdAt;
   final String updatedAt;
@@ -33,7 +34,7 @@ class Food {
       inventory: json['inventory'],
       name: json['name'],
       description: json['description'],
-      price: json['price'],
+      price: Decimal.parse(json['price']),
       image: json['image'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
@@ -75,7 +76,7 @@ class Food {
 class Addon {
   final int id;
   final String name;
-  final int price;
+  final Decimal price;
 
   Addon({
     required this.id,
@@ -87,7 +88,7 @@ class Addon {
     return Addon(
       id: json['id'],
       name: json['name'],
-      price: json['price'],
+      price: Decimal.parse(json['price']),
     );
   }
 }

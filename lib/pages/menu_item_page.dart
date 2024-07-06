@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:delivery_app/components/addons_list_item.dart';
 import 'package:delivery_app/main.dart';
 import 'package:delivery_app/models/food.dart';
@@ -27,10 +28,10 @@ class _MenuItemPageState extends State<MenuItemPage> {
   late Future<List<Addon>> addons;
   
   // total price of the item
-  int totalPrice = 0;
+  Decimal totalPrice = Decimal.parse('0');
 
   // total price of the addons
-  int addonsTotalPrice = 0;
+  Decimal addonsTotalPrice = Decimal.parse('0');
 
   // quantity of the item
   int quantity = 1;
@@ -80,18 +81,18 @@ class _MenuItemPageState extends State<MenuItemPage> {
   }
 
   // add to total
-  void addToTotal(int price) {
+  void addToTotal(Decimal price) {
     setState(() {
       addonsTotalPrice += price;
-      totalPrice += price * quantity;
+      totalPrice += price * Decimal.fromInt(quantity);
     });
   }
 
   // take away from total
-  void takeFromTotal(int price) {
+  void takeFromTotal(Decimal price) {
     setState(() {
       addonsTotalPrice -= price;
-      totalPrice -= price * quantity;
+      totalPrice -= price * Decimal.fromInt(quantity);
     });
   }
 
@@ -150,7 +151,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
                         onPressed: () {
                           setState(() {
                             quantity += 1;
-                            totalPrice = (widget.menuItemData.price + addonsTotalPrice) * quantity; 
+                            totalPrice = (widget.menuItemData.price + addonsTotalPrice) * Decimal.fromInt(quantity); 
                           });
                         },
                         icon: Icon(Icons.add),
@@ -161,7 +162,7 @@ class _MenuItemPageState extends State<MenuItemPage> {
                           if (quantity > 1) {
                             setState(() {
                               quantity -= 1;
-                              totalPrice = (widget.menuItemData.price + addonsTotalPrice) * quantity;
+                              totalPrice = (widget.menuItemData.price + addonsTotalPrice) * Decimal.fromInt(quantity);
                             });
                           }
                         },

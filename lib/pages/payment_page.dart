@@ -171,7 +171,7 @@ class _PaymentPageState extends State<PaymentPage> {
       return;
     } else {
       // If that response was not OK, throw an error.
-      throw Exception('Failed to verify transaction');
+      // throw Exception('Failed to verify transaction');
     }
   }
 

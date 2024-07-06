@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           slivers: [
             SliverAppBar(
               pinned: true,
-              title: const Text("AMAL Delivery"),
+              title: const Text("GbeWa"), // add logo as well
               expandedHeight: 200,
               collapsedHeight: 70,
               centerTitle: true,

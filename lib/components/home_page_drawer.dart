@@ -28,26 +28,35 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
 
   Future<void> _signout() async {
     // logout user
-    
-    final response = await http.post(
-      Uri.parse('${globals.serverUrl}/api/signout/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Token ${prefs.getString('auth_token')}',
-      },
-    );
-    clearPreferences();
-    if (response.statusCode == 200) {
-      print('Signed out');
-      // If the server returns an OK response, then parse the JSON.
-      final parsed = response.body;
-      print(parsed);
-    } else {
-      // If that response was not OK, throw an error.
+    try{
+      final response = await http.post(
+        Uri.parse('${globals.serverUrl}/api/signout/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Token ${prefs.getString('auth_token')}',
+        },
+      ).timeout(Duration(seconds: 5));
+      clearPreferences();
+      if (response.statusCode == 200) {
+        print('Signed out');
+        // If the server returns an OK response, then parse the JSON.
+        final parsed = response.body;
+        print(parsed);
+      } else {
+        // If that response was not OK, throw an error.
+        print('Failed to signout');
+        // throw Exception('Failed to signout');
+      }
+    } catch (e) {
       print('Failed to signout');
-      // throw Exception('Failed to signout');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('There was an error while trying to logout'),
+        ),
+      );
     }
   }
+  
   Future<void> getPrefs() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {

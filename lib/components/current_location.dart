@@ -157,11 +157,12 @@ class _CurrentLocationState extends State<CurrentLocation> {
           // address
           Text(
             "${_address ?? 'Click here to input address'}",
-            style: TextStyle(
+            style: const TextStyle(
               // color: Theme.of(context).colorScheme.inversePrimary,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
+            overflow: TextOverflow.ellipsis,
           ),
         
           //drop down menu

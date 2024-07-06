@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:delivery_app/models/food.dart';
 import 'package:delivery_app/pages/menu_item_page.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,7 @@ class MenuItem extends StatelessWidget {
   final String name;
   final String description;
   final String imagePath;
-  final int price;
+  final Decimal price;
   final Food menuItemData;
   const MenuItem({
     super.key,

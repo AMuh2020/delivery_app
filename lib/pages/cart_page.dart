@@ -1,6 +1,8 @@
 // this page is the cart page where users can view their cart and proceed to checkout
+import 'dart:async';
 import 'dart:io';
 
+import 'package:decimal/decimal.dart';
 import 'package:delivery_app/main.dart';
 import 'package:delivery_app/models/food.dart';
 import 'package:delivery_app/pages/before_payment_page.dart';
@@ -28,11 +30,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     super.initState();
   }
 
-  // send order to server
-  Future<int> processOrder(List<Food> items) async {
-    // build a json of orders and order items to send to the server
-    // converting from Food and Addon objects to json
-    final List<Map<String, dynamic>> orders = items.map((e) => e.toJson(e)).toList();
+  Future<void> completeOrderAndNavigate(List<Food> checkoutItems) async {
+    final List<Map<String, dynamic>> orders = checkoutItems.map((e) => e.toJson(e)).toList();
     print(orders);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     try{
@@ -44,49 +43,49 @@ class _CheckoutPageState extends State<CheckoutPage> {
         },
         body: jsonEncode({
           'user_id': prefs.getInt('user_id'),
-          'restaurant_id': items[0].restaurant,
+          'restaurant_id': checkoutItems[0].restaurant,
           'order_items': orders,
           'delivery_address': AddressModel.instance.address,
         }),
       ).timeout(Duration(seconds: 10));
       print(response.statusCode);
       print(response.body);
+      
       if (response.statusCode == 201) {
-        int orderId = jsonDecode(response.body)['order_id'];
-        return orderId;
+        var responseData = jsonDecode(response.body);
+        if (mounted){
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BeforePaymentPage(
+              orderId: responseData['order_id'],
+              serviceFee: responseData['service_fee'],
+              deliveryFee: responseData['delivery_fee'],
+              subtotal: responseData['subtotal'],
+              total: responseData['total'],
+            )),
+          );
+        }
       } else {
         // failed to create order
-        return -2;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create order'),
+          ),
+        );
+        return;
       }
-    }on SocketException catch (e) {
+    } on SocketException catch (e) {
         print(e);
         // cant connect to server
-        return -1;
-    }
-  }
-  Future<void> completeOrderAndNavigate(List<Food> checkoutItems) async {
-    var orderId = await processOrder(checkoutItems); // Assuming model.checkoutItems is your data
-    if (orderId == -1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Cant connect to server'),
-        ),
-      );
-      return;
-    } else if (orderId == -2) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to create order'),
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Cant connect to server'),
+          ),
+        );
+        return;
+    } on TimeoutException catch (e) {
       return;
     }
-    // After processOrder completes, navigate to the PaymentPage
-    if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => BeforePaymentPage(orderId: orderId)),
-    );
   }
 
   
@@ -123,7 +122,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      '₦${model.checkoutItems[index].price * model.checkoutItems[index].quantity}',
+                                      '₦${model.checkoutItems[index].price * Decimal.fromInt(model.checkoutItems[index].quantity)}',
                                       style: TextStyle(fontSize: 20),
                                     ),
                                     IconButton(
@@ -142,7 +141,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               itemBuilder: (context, addonIndex) {
                                 // print('Addon Index: $addonIndex');
                                 final addon = model.checkoutItems[index].addons[addonIndex];
-                                return Text(addon.name); // Display each addon's name
+                                return Text('${addon.name}'); // Display each addon's name
                               },
                               physics: NeverScrollableScrollPhysics(), // Prevents the ListView from scrolling independently
                               shrinkWrap: true, // Allows ListView to size itself according to its children
@@ -210,7 +209,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         // get a driver to deliver order
                         // notify user of delivery time in order history page and homepage + notification
                       },
-                      child: Text('Confirm and pay'),
+                      child: Text(' Go to Checkout'),
                     ),
                   ],
                 ),

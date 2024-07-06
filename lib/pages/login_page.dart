@@ -27,32 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
   // login function
   Future<void> login() async {
-    // todo: implement login
 
-    final bool loginSuccess = await performLogin(usernameController.text, passwordController.text);
-
-    
-    if (!loginSuccess) {
-      // show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login failed'),
-        ),
-      );
-      return;
-    }
-
-    // for now go to home page
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const HomePage(),
-      ),
-    );
-    return;
-  }
-  Future<bool> performLogin(String username, String password) async {
-    // api call to login
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     bool hasAuthToken = prefs.getString('auth_token')?.isNotEmpty ?? false;
@@ -63,20 +38,13 @@ class _LoginPageState extends State<LoginPage> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(<String , String>{
-          'username': username,
-          'password': password,
+          'username': usernameController.text,
+          'password': passwordController.text,
           'has_token': hasAuthToken.toString(),
         }),
       );
-      
+      var responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        // in the future use JWT or some other token -Django rest token
-        // for now store username in shared preferences
-        // prefs.setString('username', username);
-        var responseData = jsonDecode(response.body);
-
-        // Accessing the message
-        String message = responseData['message'];
 
         // Accessing user information
         var user = responseData['user'];
@@ -97,15 +65,34 @@ class _LoginPageState extends State<LoginPage> {
         // String address = user['address']; 
         // prefs.setString('address', address);
         print(response.statusCode);
-        return true;
       } else {
-        return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(responseData['message']),
+          ),
+        );
+        return;
       }
     } on SocketException catch (e) {
       print(e);
-      return false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to connect to server'),
+        ),
+      );
+      return;
     }
+
+    // for now go to home page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+    );
+    return;
   }
+  
 
 
   @override
@@ -125,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 25),
             // message, app slogan
             Text(
-              'Welcome to Delivery App',
+              'Welcome to Gbewa the delivery app exclusive to ilorin',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.secondary,
                 fontSize: 16,
@@ -152,7 +139,6 @@ class _LoginPageState extends State<LoginPage> {
               hintText: "Password",
               obscureText: true,
             ),
-
             const SizedBox(height: 25),
             //sign in button
             MyButton(
@@ -160,8 +146,6 @@ class _LoginPageState extends State<LoginPage> {
               onTap: login, 
             ),
             const SizedBox(height: 25),
-            // sign up button, not a member? sign up
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

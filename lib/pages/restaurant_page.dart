@@ -1,6 +1,7 @@
 import 'package:delivery_app/components/menu_list_item.dart';
 import 'package:delivery_app/components/current_location.dart';
 import 'package:delivery_app/components/delivery_info_box.dart';
+import 'package:delivery_app/main.dart';
 import 'package:delivery_app/pages/cart_page.dart';
 import 'package:delivery_app/utils/general_utils.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +90,24 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
     );
   }
 
+  Future<bool?> locationConfirmDialog() {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Please confirm your location'),
+        content: const CurrentLocation(),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: const Text('Done'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -98,11 +117,18 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
           clearCheckout();
           return;
         }
-        final bool shouldLeave = await _showBackDialog() ?? false;
-        print(shouldLeave);
-        if (shouldLeave && context.mounted) {
+        if (CheckoutModel.instance.checkoutItems.isEmpty) {
           Navigator.of(context).pop();
+          return;
+        } else {
+          final bool shouldLeave = await _showBackDialog() ?? false;
+          print(shouldLeave);
+          if (shouldLeave && context.mounted) {
+            Navigator.of(context).pop();
+            return;
+          }
         }
+        
       },
       child: Scaffold(
         appBar: AppBar(
@@ -110,14 +136,26 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
           actions: [
             IconButton(
               icon: Icon(Icons.shopping_cart),
-              onPressed: () {
+              onPressed: () async {
                 // Action for checkout
+                var addressFromModel = AddressModel.instance.address;
+                if (addressFromModel == '' || addressFromModel == null) {
+                  final locationDialogue = await locationConfirmDialog() ?? false;
+                  if (locationDialogue != true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Registration successful"),
+                      ),
+                    );
+                    return;
+                  }
+                }
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CheckoutPage(),
-                  ),
-                );
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CheckoutPage(),
+                      ),
+                    );
               },
             ),
           ],
