@@ -1,7 +1,8 @@
 import 'package:delivery_app/auth/login_or_register.dart';
-import 'package:delivery_app/components/my_drawer_tile.dart';
+import 'package:delivery_app/components/drawer_tile.dart';
 import 'package:delivery_app/pages/home_page.dart';
 import 'package:delivery_app/pages/orders_page.dart';
+import 'package:delivery_app/pages/profile_page.dart';
 import 'package:delivery_app/pages/settings_page.dart';
 import 'package:delivery_app/utils/general_utils.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +83,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
             ),
           ),
           const Padding(
-            padding: const EdgeInsets.all(25),
+            padding: EdgeInsets.all(25),
             child: Divider(
               // color: Theme.of(context).colorScheme.secondary,
             ),
@@ -105,7 +106,12 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
             icon: Icons.person,
             text: 'Profile',
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
+                ),
+              );
             },
           ),
           // orders list tile

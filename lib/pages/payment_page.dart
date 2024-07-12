@@ -57,6 +57,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
     // contact server to do initialization, returns auth url
     List<dynamic> data = await serverBeginInitialization();
+    print('DATA beginsd here${data}');
     if (data.isEmpty) {
       return;
     }
@@ -65,8 +66,8 @@ class _PaymentPageState extends State<PaymentPage> {
     // initialize webview
     controller
     ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    ..setUserAgent('Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Mobile Safari/537.36')
-    ..setBackgroundColor(const Color(0x00000000))
+    // ..setUserAgent('Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Mobile Safari/537.36')
+    // ..setBackgroundColor(const Color(0x00000000))
     ..setNavigationDelegate(
       NavigationDelegate(
         onProgress: (int progress) {
@@ -207,6 +208,10 @@ class _PaymentPageState extends State<PaymentPage> {
     beginInitialization();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
 
   @override

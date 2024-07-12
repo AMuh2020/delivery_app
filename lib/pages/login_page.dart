@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    bool hasAuthToken = prefs.getString('auth_token')?.isNotEmpty ?? false;
+    // bool hasAuthToken = prefs.getString('auth_token')?.isNotEmpty ?? false;
     try {
       final response = await http.post(
         Uri.parse('${globals.serverUrl}/api/signin/'),
@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
         body: jsonEncode(<String , String>{
           'username': usernameController.text,
           'password': passwordController.text,
-          'has_token': hasAuthToken.toString(),
+          'fcmtoken': '${prefs.getString('fcm_token')}',
         }),
       );
       var responseData = jsonDecode(response.body);
@@ -112,7 +112,8 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 25),
             // message, app slogan
             Text(
-              'Welcome to Gbewa the delivery app exclusive to ilorin',
+              'Welcome to GbeWa the delivery app exclusive to ilorin',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.secondary,
                 fontSize: 16,

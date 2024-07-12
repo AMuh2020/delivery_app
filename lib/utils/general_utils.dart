@@ -21,3 +21,8 @@ void clearPreferences() async{
 // lat_long
 // address
 // cart - implement
+
+void storeFCMToken(String token) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('fcm_token', token);
+}

@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:delivery_app/components/home_page_drawer.dart';
+import 'package:delivery_app/main.dart';
 import 'package:delivery_app/models/order.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:delivery_app/globals.dart' as globals;
@@ -16,6 +20,8 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage> {
 
   late Future<List<Order>> futureOrder;
+
+  StreamSubscription<RemoteMessage>? _messageSubscription;
 
   Future<List<Order>> fetchOrders() async {
     print('fetching orders');
@@ -42,6 +48,18 @@ class _OrdersPageState extends State<OrdersPage> {
   void initState() {
     super.initState();
     futureOrder = fetchOrders();
+    _messageSubscription = MessageService().messageStream.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      if (message.data['type'] == 'order_status_update') {
+        // fetch orders again
+        setState(() {
+          futureOrder = fetchOrders();
+        });
+      }
+      // if (message.notification != null) {
+      //   print('Message also contained a notification: ${message.notification}');
+      // }
+    });
   }
 
   @override
@@ -52,7 +70,7 @@ class _OrdersPageState extends State<OrdersPage> {
         drawer: HomePageDrawer(),
         appBar: AppBar(
           title: const Text('Orders'),
-          bottom: TabBar(
+          bottom: const TabBar(
             tabs: [
               Tab(text: 'In Progress'),
               Tab(text: 'Completed'),
@@ -74,7 +92,7 @@ class _OrdersPageState extends State<OrdersPage> {
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else {
-                var inProgressTerms = ['cooking', 'delivering'];
+                var inProgressTerms = ['cooking', 'delivering','delivered'];
                 var inProgressOrders = snapshot.data.where((order) => inProgressTerms.contains(order.status)).toList();
                 var completedTerms = ['completed', 'cancelled'];
                 var completedOrders = snapshot.data.where((order) => completedTerms.contains(order.status)).toList();

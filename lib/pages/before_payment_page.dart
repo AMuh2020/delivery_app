@@ -2,6 +2,7 @@
 import 'package:delivery_app/components/current_location.dart';
 import 'package:delivery_app/main.dart';
 import 'package:delivery_app/pages/payment_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -43,18 +44,53 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
 
   final addressInstance = AddressModel.instance;
 
+  StreamSubscription<RemoteMessage>? _messageSubscription;
+
   @override
   void initState() {
     super.initState();
-    _startPolling();
+    _messageSubscription = MessageService().messageStream.listen((RemoteMessage message) {
+      // Handle the message as needed for this specific page
+      print("Message received on Specific Page: ${message.data}");
+      print(message.data['type']);
+      if (message.data['type'] == 'order_status_update') {
+        print('next');
+        if (message.data['status'] == 'cooking') {
+          print('Order accepted');
+          setState(() {
+            messageWidget = const Column(
+              children: [
+                Text(
+                  'Order was accepted by the Restaurant. Proceed to payment',
+                ),
+              ],
+            );
+            restaurantAccept = true;
+          });
+        } else if (message.data['status'] == 'rejected') {
+          setState(() {
+            messageWidget = const Column(
+              children: [
+                Text(
+                  'Order was rejected by the restaurant. Reason: ...',
+                ),
+              ],
+            );
+          });
+        }
+      }
+    });
+    // _startPolling();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _messageSubscription?.cancel();
+    // _timer?.cancel();
     super.dispose();
   }
 
+  // polls the server for update on order, change to FCM??
   void _startPolling() {
     const period = Duration(seconds: 5);
     _timer = Timer.periodic(period, (timer) async {
@@ -62,9 +98,6 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
       print(status);
       if (status == 'accepted') {
         timer.cancel();
-        // // pop to cart page - this is so that the user can't come back to this page
-        // Navigator.of(context).pop();
-        // // then navigate to payment page
         print('Order accepted');
           setState(() {
           messageWidget = const Column(
@@ -76,14 +109,6 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
           );
           restaurantAccept = true;
         });
-          
-        
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => PaymentPage(orderId: widget.orderId),
-        //   ),
-        // );
       } else if (status == 'rejected') {
         timer.cancel();
         setState(() {
@@ -110,6 +135,7 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
     });
   }
 
+  // sends the check order request
   Future<String> checkOrderStatus(String orderId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
@@ -141,6 +167,7 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
     }
   }
 
+  // sends cancel order http request to server to delete from db
   Future<void> cancelOrder() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
@@ -183,6 +210,7 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
       ),
     );
   }
+
   Future<bool?> locationConfirmDialog() {
     return showDialog<bool>(
       context: context,
@@ -285,8 +313,8 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
                   children: [
                     ElevatedButton(
                       onPressed: restaurantAccept ? () async { //if condition isn't met button is null and unselectable
-                        final locationConfirmed = await locationConfirmDialog() ?? false;
-                        if (locationConfirmed && context.mounted) {
+                        // final locationConfirmed = await locationConfirmDialog() ?? false;
+                        if (context.mounted) {
                           print('Location confirmed');
                           print('Navigating to payment page');
                           Navigator.push(

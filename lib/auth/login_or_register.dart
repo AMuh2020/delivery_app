@@ -22,21 +22,25 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
 
   bool isLoggedIn = true;
   bool showLoginPage = true;
-  // for login persistence
+  // for login persistence, logs in with token
   Future<void> _checkLogin() async {
     print('checking login');
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString('auth_token');
     // check if has logged in before using auth token
-    if (prefs.getString('auth_token') != null) {
+    if (authToken != null) {
       print('has auth token');
       try {
         final response = await http.post(
           Uri.parse('${globals.serverUrl}/api/token_auth/'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Token ${prefs.getString('auth_token')}',
+            'Authorization': 'Token ${authToken}',
           },
-        ).timeout(Duration(seconds: 5));
+          body: jsonEncode({
+            'fcm_token': prefs.getString('fcm_token'),
+          }),
+        ).timeout(Duration(seconds: 10));
         print(response.statusCode);
         if (response.statusCode == 200) {
           // If the server returns an OK response, then parse the JSON.
@@ -94,15 +98,10 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
     });
   }
 
-  Future<void> _intializeFCM() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    print('fcm token: $fcmToken');
-  }
 
   @override
   void initState() {
     super.initState();
-    _intializeFCM();
     _checkLogin();
   }
 
