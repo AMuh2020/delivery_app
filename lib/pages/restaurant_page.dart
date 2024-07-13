@@ -9,6 +9,7 @@ import 'package:delivery_app/models/food.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:delivery_app/globals.dart' as globals;
 
 class RestaurantPage extends StatefulWidget {
   // gets passed the resturant name
@@ -44,7 +45,7 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
   Future<List<Food>> fetchMenuItems() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.get(
-      Uri.parse('http://192.168.0.100:8000/api/restaurants/${widget.restaurantId}/menu/'),
+      Uri.parse('${globals.serverUrl}/api/restaurants/${widget.restaurantId}/menu/'),
       headers: <String, String>{
         'Content-Type' : 'application/json; charset=UTF-8',
         'Authorization' : 'Token ${prefs.getString('auth_token')}',
