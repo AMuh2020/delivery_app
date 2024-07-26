@@ -16,7 +16,6 @@ import 'package:delivery_app/themes/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:delivery_app/firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // setup for firebase messaging
 void _configureFCMListeners(){

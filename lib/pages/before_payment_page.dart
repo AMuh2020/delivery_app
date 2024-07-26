@@ -1,5 +1,4 @@
 // this page is for contacting the restaurant to see if they can take the order
-import 'package:delivery_app/components/current_location.dart';
 import 'package:delivery_app/main.dart';
 import 'package:delivery_app/pages/payment_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -30,7 +29,6 @@ class BeforePaymentPage extends StatefulWidget {
 }
 
 class _BeforePaymentPageState extends State<BeforePaymentPage> {
-  Timer? _timer;
   String message = 'Please wait while we check if the restaurant can accept your order.';
   Widget messageWidget = const Column(
     children: [
@@ -80,7 +78,6 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
         }
       }
     });
-    // _startPolling();
   }
 
   @override
@@ -88,51 +85,6 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
     _messageSubscription?.cancel();
     // _timer?.cancel();
     super.dispose();
-  }
-
-  // polls the server for update on order, change to FCM??
-  void _startPolling() {
-    const period = Duration(seconds: 5);
-    _timer = Timer.periodic(period, (timer) async {
-      final status = await checkOrderStatus('${widget.orderId}');
-      print(status);
-      if (status == 'accepted') {
-        timer.cancel();
-        print('Order accepted');
-          setState(() {
-          messageWidget = const Column(
-            children: [
-              Text(
-                'Order was accepted by the Restaurant. Proceed to payment',
-              ),
-            ],
-          );
-          restaurantAccept = true;
-        });
-      } else if (status == 'rejected') {
-        timer.cancel();
-        setState(() {
-          messageWidget = const Column(
-            children: [
-              Text(
-                'Order was rejected by the restaurant. Reason: ...',
-              ),
-            ],
-          );
-        });
-      } else if (status == 'error') {
-        timer.cancel();
-        setState(() {
-          messageWidget = const Column(
-            children: [
-              Text(
-                'There was an error checking the order status, please cancel order and order again',
-              ),
-            ],
-          );
-        });
-      }
-    });
   }
 
   // sends the check order request
@@ -210,25 +162,6 @@ class _BeforePaymentPageState extends State<BeforePaymentPage> {
       ),
     );
   }
-
-  Future<bool?> locationConfirmDialog() {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Please confirm your location'),
-        content: const CurrentLocation(),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: const Text('Done'),
-          ),
-        ],
-      ),
-    );
-  }
-
   
   @override
   Widget build(BuildContext context) {
