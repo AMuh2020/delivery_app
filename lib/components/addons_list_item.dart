@@ -23,16 +23,11 @@ class _AddonsListItemState extends State<AddonsListItem> {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(widget.name),
-      trailing: Wrap(
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min, // Ensures the Row takes minimum space
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min, // Ensures the Row takes minimum space
-            children: [
-              Text('₦${widget.price}'),
-              widget.checkbox,
-            ],
-          ),
-          // Add more widgets here if needed
+          Text('₦${widget.price}'),
+          widget.checkbox,
         ],
       )
     );

@@ -30,6 +30,9 @@ class RestaurantPage extends StatefulWidget {
 class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProviderStateMixin{
   late Future<List<Food>> menuItems;
 
+  TabController? _tabController;
+  List<dynamic> categories = [];
+
   @override
   void initState() {
     super.initState();
@@ -54,12 +57,23 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
     
     if (response.statusCode == 200) {
       // If the server returns an OK response, then parse the JSON.
+      print("before print");
       print(response.body);
       final parsed = jsonDecode(response.body);
-      final results = parsed as List;
-      print("RESULT FROM FOOD ${results}");
+      print(parsed);
+      print(parsed['categories']);
+      setState(() {
+        // for each dictionary in the categories list, get the name
+        categories = parsed['categories'];
+        _tabController = TabController(length: parsed['categories'].length, vsync: this);
+      });
+      
+      
+      print(parsed['food_items']);
+      final food_items = parsed['food_items'] as List;
+      print("Food_items ${food_items}");
       print('test');
-      return results.map((e) => Food.fromJson(e)).toList();
+      return food_items.map((e) => Food.fromJson(e)).toList();
     } else {
       // If that response was not OK, throw an error.
       throw Exception('Failed to load resturant menu');
@@ -145,18 +159,18 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
                   if (locationDialogue != true) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text("Registration successful"),
+                        content: Text("Registration failed, please try again later"),
                       ),
                     );
                     return;
                   }
                 }
                 Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CheckoutPage(),
-                      ),
-                    );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CheckoutPage(),
+                  ),
+                );
               },
             ),
           ],
@@ -169,53 +183,76 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
             });
             await menuItems;
           },
-          child: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(25.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: FutureBuilder<List<Food>>(
+            future: menuItems,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
                   children: [
-                    Text(
-                      "Deliver now",
-                      style: TextStyle(
-                        // color: Theme.of(context).colorScheme.primary,
-                        fontSize: 16,
+                    constantWidgets(),
+                    TabBar(
+                      controller: _tabController,
+                      // isScrollable: true,
+                      tabs: List.generate(categories.length, (index) {
+                        print('Tab $index');
+                        return Tab(
+                          text: '${categories[index]['name']}',
+                        );
+                      }),
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: List.generate(categories.length, (index2) {
+                          return ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              print(snapshot.data![index].category);
+                              if (snapshot.data![index].category != categories[_tabController!.index]['id']) {
+                                return const SizedBox.shrink();
+                              }
+                              return MenuItem(
+                                menuItemObj: snapshot.data![index],
+                              );
+                            },
+                          );
+                        }),
                       ),
                     ),
-                    CurrentLocation(),
                   ],
-                ),
-              ),
-              const DeliveryInfoBox(),
-              Flexible(
-                child: FutureBuilder<List<Food>>(
-                  future: menuItems,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return MenuItem(
-                            name: snapshot.data![index].name,
-                            description: snapshot.data![index].description,
-                            imagePath: snapshot.data![index].image,
-                            price: snapshot.data![index].price,
-                            menuItemData: snapshot.data![index],
-                          );
-                        },
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                ),
-              ),
-            ],
+                );
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              return const Center(child: CircularProgressIndicator());
+            },
           ),
         ),
       ),
+    );
+    
+  }
+  Widget constantWidgets() {
+    return const Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(25.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Deliver now",
+                style: TextStyle(
+                  // color: Theme.of(context).colorScheme.primary,
+                  fontSize: 16,
+                ),
+              ),
+              CurrentLocation(),
+            ],
+          ),
+        ),
+        DeliveryInfoBox(),
+      ],
     );
   }
 }

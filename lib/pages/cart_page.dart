@@ -69,7 +69,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         // failed to create order
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to create order'),
+            content: Text('Failed to create order, check your internet connection'),
           ),
         );
         return;
@@ -109,6 +109,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       return Container(
                         padding: EdgeInsets.all(10.0), // Add padding to match ListTile's default padding
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: <Widget>[
@@ -136,37 +137,30 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                               ],
                             ),
-                            ListView.builder(
-                              itemCount: model.checkoutItems[index].addons.length,
-                              itemBuilder: (context, addonIndex) {
-                                // print('Addon Index: $addonIndex');
-                                final addon = model.checkoutItems[index].addons[addonIndex];
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: model.checkoutItems[index].addons.map((addon) {
                                 return Text('${addon.name}'); // Display each addon's name
-                              },
-                              physics: NeverScrollableScrollPhysics(), // Prevents the ListView from scrolling independently
-                              shrinkWrap: true, // Allows ListView to size itself according to its children
+                              }).toList(),
                             ),
                             // quantity
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Row(
-                                children: [
-                                  Text('Quantity: '),
-                                  IconButton(
-                                    onPressed: () {
-                                      model.increaseQuantity(model.checkoutItems[index]);
-                                    },
-                                    icon: Icon(Icons.add),
-                                  ),
-                                  Text('${model.checkoutItems[index].quantity}'),
-                                  IconButton(
-                                    onPressed: () {
-                                      model.decreaseQuantity(model.checkoutItems[index]);
-                                    },
-                                    icon: Icon(Icons.remove),
-                                  ),
-                                ],
-                              ),
+                            Row(
+                              children: [
+                                Text('Quantity: '),
+                                IconButton(
+                                  onPressed: () {
+                                    model.increaseQuantity(model.checkoutItems[index]);
+                                  },
+                                  icon: Icon(Icons.add),
+                                ),
+                                Text('${model.checkoutItems[index].quantity}'),
+                                IconButton(
+                                  onPressed: () {
+                                    model.decreaseQuantity(model.checkoutItems[index]);
+                                  },
+                                  icon: Icon(Icons.remove),
+                                ),
+                              ],
                             ),
                             Divider(),
                           ],

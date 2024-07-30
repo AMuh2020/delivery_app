@@ -1,7 +1,7 @@
 import 'package:delivery_app/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
+// clears cart
 void clearCheckout() {
   final checkoutInstance = CheckoutModel.instance;
   checkoutInstance.clearCheckoutItems();
@@ -22,7 +22,15 @@ void clearPreferences() async{
 // address
 // cart - implement
 
+// store auth token
 void storeFCMToken(String token) async {
   final prefs = await SharedPreferences.getInstance();
   prefs.setString('fcm_token', token);
+}
+
+// clear address
+void clearAddress() {
+  final addressInstance = AddressModel.instance;
+  addressInstance.setAddress(null);
+  print('cleared address');
 }

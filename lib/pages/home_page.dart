@@ -145,6 +145,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     itemBuilder: (BuildContext context, index) {
                       // Correctly access the restaurant at the current index
                       var restaurant = snapshot.data![index];
+                      // print(restaurant.image);
                       return Column(
                         children: [
                           RestaurantListItem(

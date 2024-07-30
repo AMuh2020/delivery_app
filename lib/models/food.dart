@@ -1,11 +1,13 @@
 import 'package:decimal/decimal.dart';
+import 'package:delivery_app/globals.dart' as globals;
 class Food {
   final int id;
-  final int inventory;
+  final int amountInStock;
   final String name;
+  final int? category;
   final String description;
   final Decimal price;
-  final String image;
+  final String imagePath;
   final String createdAt;
   final String updatedAt;
   final int restaurant;
@@ -16,11 +18,12 @@ class Food {
 
   Food({
     required this.id,
-    required this.inventory,
+    required this.amountInStock,
     required this.name,
+    required this.category,
     required this.description,
     required this.price,
-    required this.image,
+    required this.imagePath,
     required this.createdAt,
     required this.updatedAt,
     required this.restaurant,
@@ -28,14 +31,19 @@ class Food {
     this.quantity = 0,
   });
 
+  // converts the json data to a Food object
   factory Food.fromJson(Map<String, dynamic> json) {
+    print(json['image']);
+    print(globals.serverUrl + json['image']);
+    print('category name: ${json['category_name']}');
     return Food(
       id: json['id'],
-      inventory: json['inventory'],
+      amountInStock: json['amount_in_stock'],
       name: json['name'],
+      category: json['category'],
       description: json['description'],
       price: Decimal.parse(json['price']),
-      image: json['image'],
+      imagePath: globals.serverUrl + json['image'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       restaurant: json['restaurant'], // id of the restaurant
@@ -51,10 +59,10 @@ class Food {
     //   };
     // }
     List<Map<String, dynamic>> addonsList = addons.map((addon) => {
-    'id': addon.id,
-    'name': addon.name,
-    'price': addon.price,
-  }).toList();
+      'id': addon.id,
+      'name': addon.name,
+      'price': addon.price,
+    }).toList();
 
     // Construct the main data map
     Map<String, dynamic> data = {

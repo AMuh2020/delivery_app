@@ -2,6 +2,7 @@ import 'package:decimal/decimal.dart';
 import 'package:delivery_app/components/addons_list_item.dart';
 import 'package:delivery_app/main.dart';
 import 'package:delivery_app/models/food.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
@@ -100,130 +101,149 @@ class _MenuItemPageState extends State<MenuItemPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
+          SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 300,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(widget.menuItemData.image),
-                      fit: BoxFit.cover,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 300,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(widget.menuItemData.imagePath),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.menuItemData.name,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Text(
+                            '₦${widget.menuItemData.price}',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Text(
+                            widget.menuItemData.description,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                          ),
+                          // quantity
+                          _quantityWidget(),
+                          
+                        ],
+                      ),
+                    ),
+                    
+                    _addonsWidget(),
+
+                    // extra space to account for the bottom widget
+                    SizedBox(height: 100),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.menuItemData.name,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      Text(
-                        '₦${widget.menuItemData.price}',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      Text(
-                        widget.menuItemData.description,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 3,
-                      ),
-                      
-                    ],
-                  ),
-                ),
-                // quantity
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    children: [
-                      Text('Quantity: '),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            quantity += 1;
-                            totalPrice = (widget.menuItemData.price + addonsTotalPrice) * Decimal.fromInt(quantity); 
-                          });
-                        },
-                        icon: Icon(Icons.add),
-                      ),
-                      Text('$quantity'),
-                      IconButton(
-                        onPressed: () {
-                          if (quantity > 1) {
-                            setState(() {
-                              quantity -= 1;
-                              totalPrice = (widget.menuItemData.price + addonsTotalPrice) * Decimal.fromInt(quantity);
-                            });
-                          }
-                        },
-                        icon: Icon(Icons.remove),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: _addonsWidget()
-            
-                ),
+                
+                // Spacer(),
+                
               ],
             ),
           ),
-          
-          // Spacer(),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Stack(
-              children: [
-                _bottomWidget(),
-              ],
+            child: _bottomWidget()
+          ),
+          SafeArea(
+            child: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back),
             ),
           ),
         ],
       ),
     );
   }
+  Widget _quantityWidget() {
+    return Row(
+      children: [
+        Text('Quantity: '),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              quantity += 1;
+              totalPrice = (widget.menuItemData.price + addonsTotalPrice) * Decimal.fromInt(quantity); 
+            });
+          },
+          icon: Icon(Icons.add),
+        ),
+        Text('$quantity'),
+        IconButton(
+          onPressed: () {
+            if (quantity > 1) {
+              setState(() {
+                quantity -= 1;
+                totalPrice = (widget.menuItemData.price + addonsTotalPrice) * Decimal.fromInt(quantity);
+              });
+            }
+          },
+          icon: Icon(Icons.remove),
+        ),
+      ],
+    );
+  }
+  
   Widget _addonsWidget() {
     return FutureBuilder<List<Addon>>(
       future: addons,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          print("1. ${snapshot.data!}");  
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              return AddonsListItem(
-                name: snapshot.data![index].name,
-                price: snapshot.data![index].price,
-                checkbox: Checkbox(
-                  value: checkboxStates[index], 
-                  onChanged: (bool? value) {
-                    setState(() {
-                      print("2. $value");
-                      checkboxStates[index] = value!;
-                      if (value == true) {
-                        addToTotal(snapshot.data![index].price);
-                        selectedAddons.add(snapshot.data![index]);
-                      } else {
-                        takeFromTotal(snapshot.data![index].price);
-                        selectedAddons.removeWhere((element) {
-                          return element.name == snapshot.data![index].name;
-                        });
-                      }
-                    });
-                  },
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: Text(
+                  'Addons',
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-              );
-            },
+              ),
+              Column(
+                children: snapshot.data!.map((item) {
+                  int index = snapshot.data!.indexOf(item);
+                  return AddonsListItem(
+                    name: item.name,
+                    price: item.price,
+                    checkbox: Checkbox(
+                      value: checkboxStates[index],
+                      onChanged: (bool? value) {
+                        setState(() {
+                          print("2. $value");
+                          checkboxStates[index] = value!;
+                          if (value == true) {
+                            addToTotal(item.price);
+                            selectedAddons.add(item);
+                          } else {
+                            takeFromTotal(item.price);
+                            selectedAddons.removeWhere((element) {
+                              return element.name == item.name;
+                            });
+                          }
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
           );
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
@@ -233,12 +253,13 @@ class _MenuItemPageState extends State<MenuItemPage> {
     );
   }
 
+  // bottom widget - add to cart button
   Widget _bottomWidget() {
     return Container(
       height: 100,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-        // color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Align(
         alignment: Alignment.center,
@@ -253,11 +274,12 @@ class _MenuItemPageState extends State<MenuItemPage> {
                   // addons of true are added to the addons list
                   Food(
                     id: widget.menuItemData.id,
-                    inventory: widget.menuItemData.inventory,
+                    amountInStock: widget.menuItemData.amountInStock,
                     name: widget.menuItemData.name,
+                    category: widget.menuItemData.category,
                     description: widget.menuItemData.description,
                     price: widget.menuItemData.price + addonsTotalPrice,
-                    image: widget.menuItemData.image,
+                    imagePath: widget.menuItemData.imagePath,
                     createdAt: widget.menuItemData.createdAt,
                     updatedAt: widget.menuItemData.updatedAt,
                     restaurant: widget.menuItemData.restaurant,

@@ -37,9 +37,13 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
           'Authorization': 'Token ${prefs.getString('auth_token')}',
         },
       ).timeout(Duration(seconds: 5));
-      clearPreferences();
+      
       if (response.statusCode == 200) {
         print('Signed out');
+        // clear preferences
+        clearPreferences();
+        // clear address
+        clearAddress();
         // If the server returns an OK response, then parse the JSON.
         final parsed = response.body;
         print(parsed);
@@ -56,6 +60,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
         ),
       );
     }
+
   }
   
   Future<void> getPrefs() async {

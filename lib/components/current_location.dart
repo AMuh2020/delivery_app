@@ -16,7 +16,6 @@ class _CurrentLocationState extends State<CurrentLocation> {
   // address
   String? _address;
 
-  final addressInstance = AddressModel.instance;
 
   TextEditingController _addressController = TextEditingController();
 
@@ -64,7 +63,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
     setState(() {
       _address = placemarks[0].street.toString();
       _addressController.text = _address!;
-      addressInstance.setAddress(_address!);
+      AddressModel.instance.setAddress(_address!);
     });
   }
   Future<List<Placemark>> getPlacemark(double lat, double long) async {
@@ -75,32 +74,33 @@ class _CurrentLocationState extends State<CurrentLocation> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> latLong;
     try {
+      // fetch the lat_long from shared preferences
       latLong = prefs.getStringList('lat_long')!;
     } catch (e) {
       // Handle the exception, e.g., log the error or set a default value
       print('Error fetching lat_long: $e');
       return;
     }
-    
     double lat = double.parse(latLong[0]);
     double long = double.parse(latLong[1]);
     final placemarks = await getPlacemark(lat, long);
     setState(() {
       _address = placemarks[0].street.toString();
       _addressController.text = _address!;
-      addressInstance.setAddress(_address!);
+      AddressModel.instance.setAddress(_address!);
     });
+    
   }
 
   @override
   void initState() {
     super.initState();
     print("init state");
-    print("Address: ${addressInstance.address}");
+    print("Address: ${AddressModel.instance.address}");
     // check if address from the singleton is not null
-    if (addressInstance.address != null) {
+    if (AddressModel.instance.address != null) {
       print("Address is not null");
-      _address = addressInstance.address;
+      _address = AddressModel.instance.address;
       _addressController.text = _address!;
       print(_address);
     } else {
@@ -138,7 +138,11 @@ class _CurrentLocationState extends State<CurrentLocation> {
               Navigator.pop(context);
               setState(() {
                 _address = _addressController.text;
-                addressInstance.setAddress(_address!);
+                if (_address == "") {
+                  _address = null;
+                }
+                AddressModel.instance.setAddress(_address);
+                print("Address: ${AddressModel.instance.address}");
               });
             },
             child: Text("Save"),
@@ -155,20 +159,26 @@ class _CurrentLocationState extends State<CurrentLocation> {
       child: Row(
         children: [
           // address
-          Text(
-            "${_address ?? 'Click here to input address'}",
-            style: const TextStyle(
-              // color: Theme.of(context).colorScheme.inversePrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    "${_address ?? 'Tap here to input address'}",
+                    style: const TextStyle(
+                      // color: Theme.of(context).colorScheme.inversePrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  // color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+              ],
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        
-          //drop down menu
-          Icon(
-            Icons.keyboard_arrow_down_rounded,
-            // color: Theme.of(context).colorScheme.inversePrimary,
           ),
         ],
       ),
