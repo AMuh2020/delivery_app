@@ -143,11 +143,11 @@ class _MenuItemPageState extends State<MenuItemPage> {
                         ],
                       ),
                     ),
+                    if (widget.menuItemData.addons.isNotEmpty) _addonsWidget(),
                     
-                    _addonsWidget(),
 
                     // extra space to account for the bottom widget
-                    SizedBox(height: 100),
+                    const SizedBox(height: 100),
                   ],
                 ),
                 

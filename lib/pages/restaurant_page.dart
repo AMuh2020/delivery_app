@@ -208,7 +208,7 @@ class _RestaurantPageState extends State<RestaurantPage> with SingleTickerProvid
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
                               print(snapshot.data![index].category);
-                              if (snapshot.data![index].category != categories[_tabController!.index]['id']) {
+                              if (snapshot.data![index].category != categories[index2]['id']) {
                                 return const SizedBox.shrink();
                               }
                               return MenuItem(
